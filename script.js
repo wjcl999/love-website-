@@ -3,6 +3,9 @@ const LOVE_START_DATE = new Date('2024-02-14T00:00:00');
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
+    // 页面加载动画
+    document.body.style.animation = 'pageLoad 0.8s ease-out';
+    
     // 初始化导航
     initNavigation();
     
@@ -14,6 +17,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化消息系统
     initMessages();
+    
+    // 添加交互效果
+    initInteractiveEffects();
+    
+    // 初始化页面动画
+    initPageAnimations();
 });
 
 // 导航系统
@@ -340,3 +349,369 @@ document.addEventListener('visibilitychange', function() {
         startLoveTimer();
     }
 });
+
+// 初始化交互效果
+function initInteractiveEffects() {
+    // 添加按钮点击波纹效果
+    const buttons = document.querySelectorAll('button, .btn, .nav-links a');
+    buttons.forEach(button => {
+        if (!button.classList.contains('ripple')) {
+            button.classList.add('ripple');
+        }
+    });
+    
+    // 添加卡片悬停效果
+    const cards = document.querySelectorAll('.timeline-content, .message, .photo-item');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // 添加数字跳动效果
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateNumbers(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+    
+    // 观察时间数字元素
+    const timeUnits = document.querySelectorAll('.time-number');
+    timeUnits.forEach(unit => observer.observe(unit));
+}
+
+// 数字动画效果
+function animateNumbers(element) {
+    const finalValue = parseInt(element.textContent);
+    let currentValue = 0;
+    const increment = finalValue / 50;
+    const timer = setInterval(() => {
+        currentValue += increment;
+        if (currentValue >= finalValue) {
+            element.textContent = finalValue;
+            element.classList.add('number-roll');
+            clearInterval(timer);
+        } else {
+            element.textContent = Math.floor(currentValue);
+        }
+    }, 30);
+}
+
+// 初始化页面动画
+function initPageAnimations() {
+    // 创建气泡效果
+    createBubbles();
+    
+    // 添加页面切换动画
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+        section.addEventListener('transitionend', function() {
+            if (this.classList.contains('active')) {
+                // 重新触发内部元素的动画
+                const animatedElements = this.querySelectorAll('.fade-in-up');
+                animatedElements.forEach((el, index) => {
+                    el.style.animation = 'none';
+                    setTimeout(() => {
+                        el.style.animation = `fadeInUp 0.8s ease-out forwards`;
+                        el.style.animationDelay = `${index * 0.1}s`;
+                    }, 50);
+                });
+            }
+        });
+    });
+    
+    // 添加鼠标跟随效果
+    initMouseFollower();
+}
+
+// 创建气泡效果
+function createBubbles() {
+    const bubbleContainer = document.querySelector('.background');
+    
+    function createBubble() {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.style.left = Math.random() * 100 + '%';
+        bubble.style.width = bubble.style.height = Math.random() * 20 + 10 + 'px';
+        bubble.style.animationDuration = Math.random() * 3 + 2 + 's';
+        bubble.style.animationDelay = Math.random() * 2 + 's';
+        
+        bubbleContainer.appendChild(bubble);
+        
+        // 5秒后移除气泡
+        setTimeout(() => {
+            if (bubble.parentNode) {
+                bubble.parentNode.removeChild(bubble);
+            }
+        }, 6000);
+    }
+    
+    // 每2秒创建一个气泡
+    setInterval(createBubble, 2000);
+}
+
+// 鼠标跟随效果
+function initMouseFollower() {
+    let mouseX = 0;
+    let mouseY = 0;
+    let ballX = 0;
+    let ballY = 0;
+    let speed = 0.1;
+    
+    // 创建跟随光标
+    const follower = document.createElement('div');
+    follower.className = 'mouse-follower';
+    follower.style.cssText = `
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(circle, rgba(255,154,158,0.3) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transition: transform 0.1s ease;
+        mix-blend-mode: multiply;
+    `;
+    document.body.appendChild(follower);
+    
+    // 跟踪鼠标位置
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+    
+    // 平滑跟随动画
+    function animate() {
+        ballX += (mouseX - ballX) * speed;
+        ballY += (mouseY - ballY) * speed;
+        
+        follower.style.transform = `translate(${ballX - 10}px, ${ballY - 10}px)`;
+        
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+// 增强的消息添加功能
+function addMessage() {
+    const messageText = document.getElementById('messageText');
+    const text = messageText.value.trim();
+    
+    if (!text) {
+        // 添加错误动画
+        messageText.classList.add('error-animation');
+        setTimeout(() => messageText.classList.remove('error-animation'), 600);
+        showNotification('请输入留言内容！', 'error');
+        return;
+    }
+    
+    const message = {
+        content: text,
+        time: new Date().toLocaleDateString('zh-CN'),
+        id: Date.now()
+    };
+    
+    // 保存到localStorage
+    let messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
+    messages.unshift(message);
+    localStorage.setItem('loveMessages', JSON.stringify(messages));
+    
+    // 清空输入框
+    messageText.value = '';
+    
+    // 重新加载消息显示
+    loadMessages();
+    
+    // 显示成功提示
+    showNotification('💕 留言发送成功！', 'success');
+    
+    // 添加成功动画
+    const submitBtn = messageText.parentNode.querySelector('button');
+    submitBtn.classList.add('success-animation');
+    setTimeout(() => submitBtn.classList.remove('success-animation'), 2000);
+}
+
+// 增强的通知系统
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    const bgColors = {
+        success: 'linear-gradient(135deg, #4caf50, #66bb6a)',
+        error: 'linear-gradient(135deg, #f44336, #ef5350)',
+        info: 'linear-gradient(135deg, #2196f3, #42a5f5)'
+    };
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        background: ${bgColors[type]};
+        color: white;
+        border-radius: 15px;
+        font-weight: 500;
+        z-index: 3000;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transform: translateX(400px);
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: inherit;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // 滑入动画
+    requestAnimationFrame(() => {
+        notification.style.transform = 'translateX(0)';
+    });
+    
+    // 3秒后消失
+    setTimeout(() => {
+        notification.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                document.body.removeChild(notification);
+            }
+        }, 500);
+    }, 3000);
+}
+
+// 增强的心形创建
+function createFloatingHearts() {
+    const heartsContainer = document.querySelector('.hearts');
+    const heartEmojis = ['💖', '💕', '💗', '💓', '💝', '💘', '❤️', '💟', '💜', '🧡'];
+    
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.style.position = 'absolute';
+        heart.style.fontSize = Math.random() * 25 + 20 + 'px';
+        heart.style.left = Math.random() * 100 + '%';
+        heart.style.top = '100vh';
+        heart.style.pointerEvents = 'none';
+        heart.style.userSelect = 'none';
+        heart.style.zIndex = '1';
+        heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+        
+        const duration = Math.random() * 8 + 12;
+        const horizontalMovement = (Math.random() - 0.5) * 300;
+        const rotation = Math.random() * 720;
+        
+        heart.style.animation = `
+            heartFloat ${duration}s linear forwards,
+            heartSway ${duration * 0.3}s ease-in-out infinite alternate,
+            heartSpin ${duration}s ease-in-out forwards
+        `;
+        
+        // 添加动态CSS动画
+        if (!document.getElementById('dynamic-heart-styles')) {
+            const style = document.createElement('style');
+            style.id = 'dynamic-heart-styles';
+            style.textContent = `
+                @keyframes heartFloat {
+                    from {
+                        transform: translateY(0) scale(0.5);
+                        opacity: 0;
+                    }
+                    10% {
+                        opacity: 1;
+                        transform: translateY(-10vh) scale(1);
+                    }
+                    90% {
+                        opacity: 1;
+                        transform: translateY(-90vh) scale(1.2);
+                    }
+                    to {
+                        transform: translateY(-100vh) scale(0.3);
+                        opacity: 0;
+                    }
+                }
+                @keyframes heartSway {
+                    0%, 100% { transform: translateX(-30px) rotate(0deg); }
+                    50% { transform: translateX(30px) rotate(10deg); }
+                }
+                @keyframes heartSpin {
+                    from { filter: hue-rotate(0deg); }
+                    to { filter: hue-rotate(${rotation}deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        heartsContainer.appendChild(heart);
+        
+        setTimeout(() => {
+            if (heart.parentNode) {
+                heart.parentNode.removeChild(heart);
+            }
+        }, duration * 1000);
+    }
+    
+    // 定期创建心形
+    setInterval(createHeart, 3000);
+    
+    // 立即创建几个
+    for (let i = 0; i < 5; i++) {
+        setTimeout(createHeart, i * 800);
+    }
+}
+
+// 添加点击心形效果
+document.addEventListener('click', function(e) {
+    // 在点击位置创建爆炸心形效果
+    createClickEffect(e.clientX, e.clientY);
+});
+
+function createClickEffect(x, y) {
+    const hearts = ['💖', '💕', '✨'];
+    
+    for (let i = 0; i < 6; i++) {
+        const heart = document.createElement('div');
+        heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+        heart.style.cssText = `
+            position: fixed;
+            left: ${x}px;
+            top: ${y}px;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 9999;
+            animation: clickExplode 1s ease-out forwards;
+            animation-delay: ${i * 0.1}s;
+        `;
+        
+        document.body.appendChild(heart);
+        
+        setTimeout(() => {
+            if (heart.parentNode) {
+                document.body.removeChild(heart);
+            }
+        }, 1100);
+    }
+}
+
+// 添加点击爆炸动画
+const clickStyle = document.createElement('style');
+clickStyle.textContent = `
+    @keyframes clickExplode {
+        0% {
+            transform: scale(0) rotate(0deg);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.5) rotate(180deg);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(0) rotate(360deg) translateY(-50px);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(clickStyle);

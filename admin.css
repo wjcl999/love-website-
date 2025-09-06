@@ -850,16 +850,31 @@ body {
     .settings-grid {
         grid-template-columns: 1fr;
     }
+    
+    .questions-table {
+        overflow-x: auto;
+    }
+    
+    .questions-table table {
+        min-width: 600px;
+    }
 }
 
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;
         transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     }
     
     .sidebar.open {
         transform: translateX(0);
+    }
+    
+    .sidebar-header {
+        padding: 20px;
+        justify-content: space-between;
     }
     
     .main-content {
@@ -868,45 +883,416 @@ body {
     
     .sidebar-toggle {
         display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
     
     .top-bar {
-        padding: 15px 20px;
+        padding: 20px 70px 20px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .top-bar-actions {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
     }
     
     .breadcrumb {
-        font-size: 20px;
+        font-size: 22px;
+    }
+    
+    .admin-info {
+        align-items: flex-start;
+        text-align: left;
     }
     
     .content-section {
-        padding: 20px;
+        padding: 25px 20px;
     }
     
     .filters {
         flex-direction: column;
         align-items: stretch;
+        gap: 15px;
     }
     
     .search-box {
         max-width: none;
+        order: -1;
     }
     
     .dashboard-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    
+    .stats-card {
+        padding: 25px;
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .stats-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .stats-number {
+        font-size: 28px;
     }
     
     .section-header {
         flex-direction: column;
         align-items: stretch;
         gap: 20px;
+        text-align: center;
+    }
+    
+    .section-header h2 {
+        font-size: 24px;
     }
     
     .section-actions {
         justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    
+    .quick-btn {
+        padding: 15px 12px;
+        font-size: 14px;
+    }
+    
+    .quick-btn i {
+        font-size: 20px;
+    }
+    
+    .widget {
+        margin-bottom: 20px;
+    }
+    
+    .widget-header {
+        padding: 20px;
+    }
+    
+    .widget-content {
+        padding: 20px;
+    }
+    
+    .today-question {
+        text-align: center;
+    }
+    
+    .question-text {
+        font-size: 15px;
+        padding: 18px;
+    }
+    
+    .questions-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .questions-table table {
+        min-width: 700px;
+    }
+    
+    .questions-table th,
+    .questions-table td {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+    
+    .images-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+    }
+    
+    .timeline-item {
+        padding: 20px;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .timeline-date {
+        width: auto;
+        align-self: flex-start;
+    }
+    
+    .message-item {
+        padding: 20px;
+    }
+    
+    .settings-card {
+        padding: 25px 20px;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 14px;
+        font-size: 16px;
+    }
+    
+    .modal {
+        padding: 20px;
+    }
+    
+    .modal-content {
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
+    }
+    
+    .modal-header {
+        padding: 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .upload-area {
+        padding: 30px 20px;
+    }
+    
+    .upload-area i {
+        font-size: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-toggle {
+        top: 15px;
+        left: 15px;
+        padding: 10px;
+    }
+    
+    .top-bar {
+        padding: 15px 60px 15px 15px;
+        gap: 12px;
+    }
+    
+    .breadcrumb {
+        font-size: 20px;
+    }
+    
+    .top-bar-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .admin-info {
+        text-align: center;
+        align-items: center;
+    }
+    
+    .admin-name {
+        font-size: 14px;
+    }
+    
+    .login-time {
+        font-size: 11px;
+    }
+    
+    .content-section {
+        padding: 20px 15px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-card {
+        padding: 20px;
+    }
+    
+    .stats-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    
+    .stats-number {
+        font-size: 24px;
+    }
+    
+    .stats-label {
+        font-size: 12px;
+    }
+    
+    .section-header h2 {
+        font-size: 22px;
     }
     
     .quick-actions {
         grid-template-columns: 1fr;
+    }
+    
+    .quick-btn {
+        padding: 18px;
+        font-size: 15px;
+    }
+    
+    .questions-table th,
+    .questions-table td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .btn {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+    
+    .btn-sm {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    
+    .images-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+    }
+    
+    .image-item img {
+        height: 120px;
+    }
+    
+    .image-info {
+        padding: 12px;
+    }
+    
+    .image-title {
+        font-size: 14px;
+    }
+    
+    .image-date {
+        font-size: 11px;
+    }
+    
+    .timeline-item {
+        padding: 18px;
+    }
+    
+    .timeline-title {
+        font-size: 16px;
+    }
+    
+    .timeline-description {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .message-item {
+        padding: 18px;
+    }
+    
+    .message-content {
+        padding: 15px;
+        font-size: 14px;
+    }
+    
+    .settings-card {
+        padding: 20px 18px;
+    }
+    
+    .settings-card h3 {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 18px;
+    }
+    
+    .form-group label {
+        font-size: 14px;
+        margin-bottom: 6px;
+    }
+    
+    .modal-header {
+        padding: 18px;
+    }
+    
+    .modal-header h3 {
+        font-size: 18px;
+    }
+    
+    .modal-body {
+        padding: 18px;
+    }
+    
+    .modal-footer {
+        padding: 12px 18px;
+    }
+    
+    .upload-area {
+        padding: 25px 15px;
+    }
+    
+    .upload-area i {
+        font-size: 35px;
+        margin-bottom: 12px;
+    }
+    
+    .upload-area p {
+        font-size: 14px;
+    }
+}
+
+/* 优化滚动条在移动端的显示 */
+@media (max-width: 768px) {
+    .questions-table::-webkit-scrollbar {
+        height: 4px;
+    }
+    
+    .questions-table::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 2px;
+    }
+    
+    .questions-table::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 2px;
+    }
+    
+    .questions-table::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
     }
 }
 

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我们的爱情时光 ❤️</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="animations.css">
 </head>
 <body>
     <div class="background">
@@ -26,19 +27,19 @@
         <!-- 首页部分 -->
         <section id="home-section" class="section active">
             <div class="hero">
-                <h1 class="love-title">❤️ 我们的爱情故事 ❤️</h1>
-                <div class="couple-info">
+                <h1 class="love-title rainbow-text fade-in-up">❤️ 我们的爱情故事 ❤️</h1>
+                <div class="couple-info fade-in-up delay-200">
                     <div class="person">
-                        <div class="avatar">👨‍💻</div>
+                        <div class="avatar glow-on-hover">👨‍💻</div>
                         <h3>小明</h3>
                     </div>
-                    <div class="heart-center">💕</div>
+                    <div class="heart-center" style="animation: heartBeat 2s ease-in-out infinite;">💕</div>
                     <div class="person">
-                        <div class="avatar">👩‍🎨</div>
+                        <div class="avatar glow-on-hover">👩‍🎨</div>
                         <h3>小红</h3>
                     </div>
                 </div>
-                <div class="love-counter">
+                <div class="love-counter glow-on-hover fade-in-up delay-400">
                     <h2>我们已经在一起</h2>
                     <div id="love-duration" class="duration"></div>
                 </div>
@@ -77,19 +78,19 @@
         <section id="gallery-section" class="section">
             <h2>📸 甜蜜回忆</h2>
             <div class="gallery">
-                <div class="photo-item" onclick="openModal('photo1')">
-                    <div class="photo-placeholder">📷</div>
+                <div class="photo-item photo-zoom glow-on-hover fade-in-up" onclick="openModal('photo1')">
+                    <div class="photo-placeholder rotate-infinite">📷</div>
                     <p>第一次约会</p>
                 </div>
-                <div class="photo-item" onclick="openModal('photo2')">
+                <div class="photo-item photo-zoom glow-on-hover fade-in-up delay-100" onclick="openModal('photo2')">
                     <div class="photo-placeholder">📷</div>
                     <p>一起旅行</p>
                 </div>
-                <div class="photo-item" onclick="openModal('photo3')">
+                <div class="photo-item photo-zoom glow-on-hover fade-in-up delay-200" onclick="openModal('photo3')">
                     <div class="photo-placeholder">📷</div>
                     <p>日常生活</p>
                 </div>
-                <div class="photo-item" onclick="openModal('photo4')">
+                <div class="photo-item photo-zoom glow-on-hover fade-in-up delay-300" onclick="openModal('photo4')">
                     <div class="photo-placeholder">📷</div>
                     <p>节日庆祝</p>
                 </div>
