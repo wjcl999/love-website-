@@ -53,9 +53,6 @@
             <div class="auth-footer">
                 <div class="help-section">
                     <p class="help-text">💡 提示：答案不区分大小写</p>
-                    <div class="admin-link">
-                        <a href="#" onclick="showAdminLogin()" style="color: #ccc; font-size: 12px;">管理员</a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -74,22 +71,6 @@
         </div>
     </div>
 
-    <!-- 管理员快速登录弹窗 -->
-    <div id="adminModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>管理员登录</h3>
-                <span class="close" onclick="hideAdminLogin()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <input type="password" id="adminPassword" placeholder="管理员密码" maxlength="50">
-                <button onclick="adminLogin()">登录后台</button>
-                <div id="adminError" class="error-message" style="display: none; margin-top: 10px;">
-                    <span class="error-text"></span>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script src="questions.js"></script>
     <script src="auth.js"></script>

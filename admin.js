@@ -37,6 +37,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 检查管理员认证
 function checkAdminAuth() {
+    // 检查是否通过666后门进入（检查来源页面）
+    const referrer = document.referrer;
+    if (referrer && referrer.includes('auth.html')) {
+        // 从验证页面过来的，设置临时管理员会话
+        const sessionData = {
+            timestamp: Math.floor(Date.now() / 1000),
+            role: 'admin'
+        };
+        setStorageItem('love_admin_session', sessionData);
+        return true;
+    }
+    
     const adminSession = getStorageItem('love_admin_session');
     if (!adminSession) return false;
     

