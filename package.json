@@ -1,0 +1,32 @@
+{
+  "name": "love-website",
+  "version": "1.0.0",
+  "description": "💕 一个浪漫的情侣纪念网站，记录甜蜜时光",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python -m http.server 8080 || php -S localhost:8080 || npx serve .",
+    "build": "echo '构建完成 - 静态文件已准备就绪' && echo '🚀 准备部署到 Cloudflare Pages'",
+    "deploy": "echo '请将文件上传至 Cloudflare Pages 或连接 Git 仓库'"
+  },
+  "keywords": [
+    "love",
+    "couple",
+    "romantic",
+    "website",
+    "cloudflare-pages",
+    "static-site"
+  ],
+  "author": "情侣开发者",
+  "license": "MIT",
+  "homepage": "https://your-love-site.pages.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/love-website.git"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "serve": "^14.0.0"
+  }
+}

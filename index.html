@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我们的爱情时光 ❤️</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background">
+        <div class="hearts"></div>
+    </div>
+
+    <div class="container">
+        <!-- 头部导航 -->
+        <nav class="navbar">
+            <div class="nav-brand">❤️ Our Love Story</div>
+            <div class="nav-links">
+                <a href="#home" data-target="home-section">首页</a>
+                <a href="#timeline" data-target="timeline-section">时光轴</a>
+                <a href="#gallery" data-target="gallery-section">相册</a>
+                <a href="#message" data-target="message-section">留言</a>
+            </div>
+        </nav>
+
+        <!-- 首页部分 -->
+        <section id="home-section" class="section active">
+            <div class="hero">
+                <h1 class="love-title">❤️ 我们的爱情故事 ❤️</h1>
+                <div class="couple-info">
+                    <div class="person">
+                        <div class="avatar">👨‍💻</div>
+                        <h3>小明</h3>
+                    </div>
+                    <div class="heart-center">💕</div>
+                    <div class="person">
+                        <div class="avatar">👩‍🎨</div>
+                        <h3>小红</h3>
+                    </div>
+                </div>
+                <div class="love-counter">
+                    <h2>我们已经在一起</h2>
+                    <div id="love-duration" class="duration"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 时光轴部分 -->
+        <section id="timeline-section" class="section">
+            <h2>💖 重要时刻</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">2024-01-14</div>
+                    <div class="timeline-content">
+                        <h3>💕 第一次相遇</h3>
+                        <p>在咖啡厅的那个午后，阳光正好，你也正好...</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2024-02-14</div>
+                    <div class="timeline-content">
+                        <h3>💝 确定关系</h3>
+                        <p>情人节的告白，从此我们成为了彼此最重要的人</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2024-06-01</div>
+                    <div class="timeline-content">
+                        <h3>🎂 第一次生日</h3>
+                        <p>一起度过的第一个生日，许下了永远在一起的愿望</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 相册部分 -->
+        <section id="gallery-section" class="section">
+            <h2>📸 甜蜜回忆</h2>
+            <div class="gallery">
+                <div class="photo-item" onclick="openModal('photo1')">
+                    <div class="photo-placeholder">📷</div>
+                    <p>第一次约会</p>
+                </div>
+                <div class="photo-item" onclick="openModal('photo2')">
+                    <div class="photo-placeholder">📷</div>
+                    <p>一起旅行</p>
+                </div>
+                <div class="photo-item" onclick="openModal('photo3')">
+                    <div class="photo-placeholder">📷</div>
+                    <p>日常生活</p>
+                </div>
+                <div class="photo-item" onclick="openModal('photo4')">
+                    <div class="photo-placeholder">📷</div>
+                    <p>节日庆祝</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 留言部分 -->
+        <section id="message-section" class="section">
+            <h2>💌 爱的留言</h2>
+            <div class="message-container">
+                <div class="message-form">
+                    <textarea id="messageText" placeholder="写下想对TA说的话..."></textarea>
+                    <button onclick="addMessage()">💕 发送爱意</button>
+                </div>
+                <div class="messages" id="messagesList">
+                    <div class="message">
+                        <div class="message-content">每天和你在一起都是最幸福的时光 💕</div>
+                        <div class="message-time">2024-09-01</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 照片模态框 -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalPhoto" class="modal-photo">📷</div>
+            <p id="modalCaption"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

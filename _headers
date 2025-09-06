@@ -1,0 +1,41 @@
+# HTTP Headers Configuration for Cloudflare Pages
+
+# Global headers for all files
+/*
+  # Security headers
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  
+  # Performance headers
+  Cache-Control: public, max-age=31536000
+  
+  # Custom headers
+  X-Powered-By: Love ❤️
+
+# HTML files - shorter cache for dynamic content
+/*.html
+  Cache-Control: public, max-age=3600
+  Content-Type: text/html; charset=utf-8
+
+# CSS files - long cache with immutable
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: text/css; charset=utf-8
+
+# JavaScript files - long cache with immutable
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: application/javascript; charset=utf-8
+
+# Enable gzip compression for better performance
+/*.html
+  Content-Encoding: gzip
+
+/*.css
+  Content-Encoding: gzip
+  
+/*.js
+  Content-Encoding: gzip
