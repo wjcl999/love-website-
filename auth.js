@@ -132,8 +132,29 @@ async function submitAnswer() {
     
     // 检查隐藏后门
     if (userAnswer === '666') {
-        // 隐藏后门：直接进入管理后台
-        window.location.href = 'admin.html';
+        // 隐藏后门：设置管理员会话并进入管理后台
+        const sessionData = {
+            timestamp: Math.floor(Date.now() / 1000),
+            role: 'admin'
+        };
+        setStorageItem(STORAGE_KEYS.ADMIN_SESSION, sessionData);
+        
+        // 显示进入管理后台的成功动画
+        const card = document.querySelector('.auth-card');
+        card.innerHTML = `
+            <div class="success-animation" style="text-align: center; padding: 40px 0;">
+                <div style="font-size: 80px; margin-bottom: 20px; animation: bounce 1s ease-in-out;">⚙️</div>
+                <h2 style="color: #667eea; margin-bottom: 15px;">管理员模式</h2>
+                <p style="color: #666; margin-bottom: 25px;">正在进入管理后台...</p>
+                <div class="loading-progress" style="background: #eee; height: 4px; border-radius: 2px; overflow: hidden;">
+                    <div style="height: 100%; background: linear-gradient(45deg, #667eea, #764ba2); width: 0%; animation: progress 2s ease-out forwards;"></div>
+                </div>
+            </div>
+        `;
+        
+        setTimeout(() => {
+            window.location.href = 'admin.html';
+        }, 2000);
         return;
     }
     
