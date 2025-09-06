@@ -137,7 +137,14 @@ async function submitAnswer() {
             timestamp: Math.floor(Date.now() / 1000),
             role: 'admin'
         };
-        setStorageItem(STORAGE_KEYS.ADMIN_SESSION, sessionData);
+        
+        // 使用直接的localStorage设置，确保立即生效
+        try {
+            localStorage.setItem('love_admin_session', JSON.stringify(sessionData));
+            console.log('Admin session set:', sessionData);
+        } catch (error) {
+            console.error('Failed to set admin session:', error);
+        }
         
         // 显示进入管理后台的成功动画
         const card = document.querySelector('.auth-card');
@@ -152,7 +159,11 @@ async function submitAnswer() {
             </div>
         `;
         
+        // 延迟跳转，确保会话已保存
         setTimeout(() => {
+            // 再次确认会话已保存
+            const saved = localStorage.getItem('love_admin_session');
+            console.log('Session before redirect:', saved);
             window.location.href = 'admin.html';
         }, 2000);
         return;
