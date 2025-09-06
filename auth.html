@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 验证身份 - 我们的私密空间</title>
+    <link rel="stylesheet" href="auth.css">
+</head>
+<body>
+    <div class="auth-background">
+        <div class="floating-hearts"></div>
+    </div>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="logo">💕</div>
+                <h1>我们的私密空间</h1>
+                <p>只有相爱的人才能进入...</p>
+            </div>
+
+            <div class="question-section">
+                <div class="date-display">
+                    <span id="currentDate"></span>
+                </div>
+                
+                <div class="question-card">
+                    <div class="question-icon">❓</div>
+                    <h2 id="dailyQuestion">加载中...</h2>
+                </div>
+
+                <div class="answer-section">
+                    <div class="input-group">
+                        <input type="text" id="answerInput" placeholder="请输入答案..." maxlength="50">
+                        <button id="submitBtn" onclick="submitAnswer()">
+                            <span class="btn-text">💖 进入</span>
+                            <span class="btn-loading" style="display: none;">⏳ 验证中...</span>
+                        </button>
+                    </div>
+                    
+                    <div id="errorMessage" class="error-message" style="display: none;">
+                        <span class="error-icon">❌</span>
+                        <span class="error-text"></span>
+                    </div>
+
+                    <div id="attemptsRemaining" class="attempts-info" style="display: none;">
+                        剩余尝试次数: <span id="attemptsCount">3</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-footer">
+                <div class="help-section">
+                    <p class="help-text">💡 提示：答案不区分大小写</p>
+                    <div class="admin-link">
+                        <a href="#" onclick="showAdminLogin()" style="color: #ccc; font-size: 12px;">管理员</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 锁定状态 -->
+        <div id="lockoutCard" class="auth-card lockout-card" style="display: none;">
+            <div class="lockout-content">
+                <div class="lockout-icon">🔒</div>
+                <h2>账户已锁定</h2>
+                <p>由于多次错误尝试，账户已被锁定</p>
+                <div class="lockout-timer">
+                    <span>解锁倒计时: </span>
+                    <span id="lockoutCountdown">60:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理员快速登录弹窗 -->
+    <div id="adminModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>管理员登录</h3>
+                <span class="close" onclick="hideAdminLogin()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <input type="password" id="adminPassword" placeholder="管理员密码" maxlength="50">
+                <button onclick="adminLogin()">登录后台</button>
+                <div id="adminError" class="error-message" style="display: none; margin-top: 10px;">
+                    <span class="error-text"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="questions.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

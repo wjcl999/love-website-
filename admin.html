@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💕 管理后台 - 爱情网站管理中心</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">💕</span>
+                    <span class="logo-text">爱情管理中心</span>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" onclick="showSection('dashboard')">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>仪表盘</span>
+                </a>
+                <a href="#questions" class="nav-item" onclick="showSection('questions')">
+                    <i class="fas fa-question-circle"></i>
+                    <span>问题管理</span>
+                </a>
+                <a href="#images" class="nav-item" onclick="showSection('images')">
+                    <i class="fas fa-images"></i>
+                    <span>图片管理</span>
+                </a>
+                <a href="#timeline" class="nav-item" onclick="showSection('timeline')">
+                    <i class="fas fa-clock"></i>
+                    <span>时光轴</span>
+                </a>
+                <a href="#messages" class="nav-item" onclick="showSection('messages')">
+                    <i class="fas fa-comments"></i>
+                    <span>留言管理</span>
+                </a>
+                <a href="#settings" class="nav-item" onclick="showSection('settings')">
+                    <i class="fas fa-cog"></i>
+                    <span>系统设置</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>退出登录</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 顶部栏 -->
+            <header class="top-bar">
+                <div class="breadcrumb">
+                    <span id="currentSection">仪表盘</span>
+                </div>
+                <div class="top-bar-actions">
+                    <button class="btn btn-primary" onclick="visitMainSite()">
+                        <i class="fas fa-external-link-alt"></i>
+                        访问主站
+                    </button>
+                    <div class="admin-info">
+                        <span class="admin-name">管理员</span>
+                        <span class="login-time" id="loginTime"></span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 仪表盘 -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="dashboard-grid">
+                    <div class="stats-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number" id="totalQuestions">25</div>
+                            <div class="stats-label">问题总数</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number" id="totalImages">0</div>
+                            <div class="stats-label">图片总数</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number" id="totalMessages">1</div>
+                            <div class="stats-label">留言总数</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <div class="stats-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-number" id="todayVisits">0</div>
+                            <div class="stats-label">今日访问</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-widgets">
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h3>今日问题</h3>
+                            <button class="btn btn-sm" onclick="refreshTodayQuestion()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div class="widget-content">
+                            <div class="today-question">
+                                <div class="question-text" id="todayQuestionText">加载中...</div>
+                                <div class="question-answers">
+                                    <strong>正确答案：</strong>
+                                    <span id="todayQuestionAnswers">加载中...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget">
+                        <div class="widget-header">
+                            <h3>快速操作</h3>
+                        </div>
+                        <div class="widget-content">
+                            <div class="quick-actions">
+                                <button class="quick-btn" onclick="showSection('questions'); showAddQuestionModal()">
+                                    <i class="fas fa-plus"></i>
+                                    添加问题
+                                </button>
+                                <button class="quick-btn" onclick="showSection('images'); showUploadModal()">
+                                    <i class="fas fa-upload"></i>
+                                    上传图片
+                                </button>
+                                <button class="quick-btn" onclick="showSection('timeline'); showAddTimelineModal()">
+                                    <i class="fas fa-calendar-plus"></i>
+                                    添加时刻
+                                </button>
+                                <button class="quick-btn" onclick="exportAllData()">
+                                    <i class="fas fa-download"></i>
+                                    导出数据
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 问题管理 -->
+            <section id="questions-section" class="content-section">
+                <div class="section-header">
+                    <h2>问题管理</h2>
+                    <button class="btn btn-primary" onclick="showAddQuestionModal()">
+                        <i class="fas fa-plus"></i>
+                        添加问题
+                    </button>
+                </div>
+
+                <div class="filters">
+                    <select id="categoryFilter" onchange="filterQuestions()">
+                        <option value="">全部分类</option>
+                        <option value="first_meet">初次相遇</option>
+                        <option value="important_date">重要日期</option>
+                        <option value="daily_life">日常生活</option>
+                        <option value="pet_name">昵称宠物</option>
+                        <option value="preferences">喜好习惯</option>
+                        <option value="memory">美好回忆</option>
+                        <option value="future">未来计划</option>
+                    </select>
+                    
+                    <select id="difficultyFilter" onchange="filterQuestions()">
+                        <option value="">全部难度</option>
+                        <option value="easy">简单</option>
+                        <option value="medium">中等</option>
+                        <option value="hard">困难</option>
+                    </select>
+                    
+                    <div class="search-box">
+                        <input type="text" id="questionSearch" placeholder="搜索问题..." onkeyup="searchQuestions()">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <div class="questions-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>问题</th>
+                                <th>分类</th>
+                                <th>难度</th>
+                                <th>答案数量</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questionsTableBody">
+                            <!-- 问题列表将通过JS动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 图片管理 -->
+            <section id="images-section" class="content-section">
+                <div class="section-header">
+                    <h2>图片管理</h2>
+                    <button class="btn btn-primary" onclick="showUploadModal()">
+                        <i class="fas fa-upload"></i>
+                        上传图片
+                    </button>
+                </div>
+
+                <div class="images-grid" id="imagesGrid">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>暂无图片，点击上传按钮添加照片</p>
+                        <button class="btn btn-outline" onclick="showUploadModal()">开始上传</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 时光轴管理 -->
+            <section id="timeline-section" class="content-section">
+                <div class="section-header">
+                    <h2>时光轴管理</h2>
+                    <button class="btn btn-primary" onclick="showAddTimelineModal()">
+                        <i class="fas fa-plus"></i>
+                        添加时刻
+                    </button>
+                </div>
+
+                <div class="timeline-list" id="timelineList">
+                    <!-- 时光轴项目将通过JS动态生成 -->
+                </div>
+            </section>
+
+            <!-- 留言管理 -->
+            <section id="messages-section" class="content-section">
+                <div class="section-header">
+                    <h2>留言管理</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-outline" onclick="exportMessages()">
+                            <i class="fas fa-download"></i>
+                            导出留言
+                        </button>
+                        <button class="btn btn-danger" onclick="clearAllMessages()">
+                            <i class="fas fa-trash"></i>
+                            清空留言
+                        </button>
+                    </div>
+                </div>
+
+                <div class="messages-list" id="messagesList">
+                    <!-- 留言列表将通过JS动态生成 -->
+                </div>
+            </section>
+
+            <!-- 系统设置 -->
+            <section id="settings-section" class="content-section">
+                <div class="section-header">
+                    <h2>系统设置</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3>安全设置</h3>
+                        <div class="form-group">
+                            <label>最大尝试次数</label>
+                            <input type="number" id="maxAttempts" value="3" min="1" max="10">
+                        </div>
+                        <div class="form-group">
+                            <label>锁定时间（分钟）</label>
+                            <input type="number" id="lockoutDuration" value="60" min="5" max="1440">
+                        </div>
+                        <div class="form-group">
+                            <label>会话持续时间（小时）</label>
+                            <input type="number" id="sessionDuration" value="24" min="1" max="168">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSecuritySettings()">保存设置</button>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>图床配置</h3>
+                        <div class="form-group">
+                            <label>图床服务</label>
+                            <select id="imageHosting">
+                                <option value="local">本地存储</option>
+                                <option value="qiniu">七牛云</option>
+                                <option value="tencent">腾讯云COS</option>
+                                <option value="aliyun">阿里云OSS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>API密钥</label>
+                            <input type="password" id="apiKey" placeholder="请输入API密钥">
+                        </div>
+                        <div class="form-group">
+                            <label>存储桶名称</label>
+                            <input type="text" id="bucketName" placeholder="请输入存储桶名称">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveImageSettings()">保存配置</button>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>数据管理</h3>
+                        <div class="form-group">
+                            <button class="btn btn-outline" onclick="exportAllData()">
+                                <i class="fas fa-download"></i>
+                                导出所有数据
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <input type="file" id="importFile" accept=".json" style="display: none;">
+                            <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">
+                                <i class="fas fa-upload"></i>
+                                导入数据
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-danger" onclick="resetAllData()">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                重置所有数据
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- 弹窗模态框 -->
+    <div id="modalOverlay" class="modal-overlay">
+        <!-- 添加问题弹窗 -->
+        <div id="addQuestionModal" class="modal">
+            <div class="modal-header">
+                <h3>添加问题</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="questionForm">
+                    <div class="form-group">
+                        <label>问题内容</label>
+                        <textarea id="questionText" placeholder="请输入问题内容..." rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>分类</label>
+                        <select id="questionCategory">
+                            <option value="first_meet">初次相遇</option>
+                            <option value="important_date">重要日期</option>
+                            <option value="daily_life">日常生活</option>
+                            <option value="pet_name">昵称宠物</option>
+                            <option value="preferences">喜好习惯</option>
+                            <option value="memory">美好回忆</option>
+                            <option value="future">未来计划</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>难度</label>
+                        <select id="questionDifficulty">
+                            <option value="easy">简单</option>
+                            <option value="medium">中等</option>
+                            <option value="hard">困难</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>正确答案（每行一个）</label>
+                        <textarea id="questionAnswers" placeholder="答案1&#10;答案2&#10;答案3" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>提示信息</label>
+                        <input type="text" id="questionHint" placeholder="给出一些提示...">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveQuestion()">保存</button>
+            </div>
+        </div>
+
+        <!-- 上传图片弹窗 -->
+        <div id="uploadModal" class="modal">
+            <div class="modal-header">
+                <h3>上传图片</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>点击选择文件或拖拽文件到此处</p>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                </div>
+                <div id="uploadProgress" class="upload-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <span class="progress-text">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="questions.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

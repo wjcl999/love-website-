@@ -124,5 +124,77 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // 检查访问权限 - 必须通过验证才能访问
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查是否通过今日验证
+            const authData = JSON.parse(localStorage.getItem('love_auth_status') || 'null');
+            
+            if (!authData) {
+                // 没有验证记录，跳转到验证页面
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            const now = Math.floor(Date.now() / 1000);
+            const authTime = authData.timestamp;
+            const isValid = (now - authTime) < (24 * 60 * 60); // 24小时有效期
+            
+            // 检查是否是今天的验证
+            const today = new Date().toDateString();
+            const authDate = new Date(authTime * 1000).toDateString();
+            const isSameDay = today === authDate;
+            
+            if (!isValid || !isSameDay) {
+                // 验证已过期或不是今天的验证，重新验证
+                localStorage.removeItem('love_auth_status');
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            // 验证通过，显示欢迎消息
+            setTimeout(() => {
+                showWelcomeMessage();
+            }, 1000);
+        });
+        
+        // 显示欢迎消息
+        function showWelcomeMessage() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 30px;
+                background: linear-gradient(45deg, #667eea, #764ba2);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 15px;
+                font-weight: 500;
+                z-index: 3000;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                transform: translateX(400px);
+                transition: transform 0.5s ease;
+                font-family: inherit;
+            `;
+            notification.innerHTML = '💕 欢迎回到我们的爱情世界！';
+            
+            document.body.appendChild(notification);
+            
+            // 滑入动画
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // 3秒后消失
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
+                }, 500);
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
