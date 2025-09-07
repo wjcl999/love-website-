@@ -306,25 +306,12 @@ function loadStaticTimeline() {
             day: 'numeric'
         });
         
-        // 创建主要内容
-        timelineItem.innerHTML = `
-            <div class="timeline-date">${formattedDate}</div>
-            <div class="timeline-content">
-                <div class="timeline-icon">${item.icon}</div>
-                <h3>${item.title}</h3>
-                <p>${item.description}</p>
-            </div>
-        `;
+        // 创建包含文字和图片的完整项目
+        let imageContent = '';
         
-        timelineContainer.appendChild(timelineItem);
-        
-        // 如果有图片，在对侧添加缩略图
+        // 如果有单张图片
         if (item.image) {
-            const timelineImage = document.createElement('div');
-            timelineImage.className = 'timeline-image-item';
-            timelineImage.style.animationDelay = (index * 0.2 + 0.1) + 's';
-            
-            timelineImage.innerHTML = `
+            imageContent = `
                 <div class="timeline-image-wrapper" onclick="openTimelineImage('${item.image}', '${item.title}')" ontouchstart="">
                     <img src="${item.image}" alt="${item.title}">
                     <div class="image-overlay">
@@ -332,16 +319,10 @@ function loadStaticTimeline() {
                     </div>
                 </div>
             `;
-            
-            timelineContainer.appendChild(timelineImage);
         }
         
-        // 如果有多张图片，在对侧横向排列缩略图
+        // 如果有多张图片
         if (item.images) {
-            const timelineImages = document.createElement('div');
-            timelineImages.className = 'timeline-image-item';
-            timelineImages.style.animationDelay = (index * 0.2 + 0.1) + 's';
-            
             const imagesHtml = item.images.map(imageUrl => `
                 <div class="timeline-image-wrapper horizontal" onclick="openTimelineImage('${imageUrl}', '${item.title}')" ontouchstart="">
                     <img src="${imageUrl}" alt="${item.title}">
@@ -351,10 +332,21 @@ function loadStaticTimeline() {
                 </div>
             `).join('');
             
-            timelineImages.innerHTML = `<div class="timeline-images-horizontal">${imagesHtml}</div>`;
-            
-            timelineContainer.appendChild(timelineImages);
+            imageContent = `<div class="timeline-images-horizontal">${imagesHtml}</div>`;
         }
+        
+        // 组合文字和图片内容
+        timelineItem.innerHTML = `
+            <div class="timeline-date">${formattedDate}</div>
+            <div class="timeline-content">
+                <div class="timeline-icon">${item.icon}</div>
+                <h3>${item.title}</h3>
+                <p>${item.description}</p>
+                ${imageContent}
+            </div>
+        `;
+        
+        timelineContainer.appendChild(timelineItem);
     });
 }
 
