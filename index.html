@@ -17,10 +17,10 @@
         <nav class="navbar">
             <div class="nav-brand">❤️ Our Love Story</div>
             <div class="nav-links">
-                <a href="#home" data-target="home-section">首页</a>
+                <a href="#home" data-target="home-section" class="active">首页</a>
                 <a href="#timeline" data-target="timeline-section">时光轴</a>
                 <a href="#gallery" data-target="gallery-section">相册</a>
-                <a href="#message" data-target="message-section">留言</a>
+                <a href="#weather" data-target="weather-section">天气</a>
             </div>
         </nav>
 
@@ -31,12 +31,12 @@
                 <div class="couple-info fade-in-up delay-200">
                     <div class="person">
                         <div class="avatar glow-on-hover">👨‍💻</div>
-                        <h3>小明</h3>
+                        <h3>奕铭</h3>
                     </div>
                     <div class="heart-center" style="animation: heartBeat 2s ease-in-out infinite;">💕</div>
                     <div class="person">
                         <div class="avatar glow-on-hover">👩‍🎨</div>
-                        <h3>小红</h3>
+                        <h3>佳怡</h3>
                     </div>
                 </div>
                 <div class="love-counter glow-on-hover fade-in-up delay-400">
@@ -80,25 +80,13 @@
             </div>
         </section>
 
-        <!-- 留言部分 -->
-        <section id="message-section" class="section">
-            <h2>💌 爱的留言</h2>
-            <div class="message-container">
-                <div class="message-form">
-                    <textarea id="messageText" placeholder="写下想对TA说的话..." maxlength="500"></textarea>
-                    <div class="message-form-footer">
-                        <div class="char-count">
-                            <span id="charCount">0</span>/500
-                        </div>
-                        <button onclick="addMessage()">💕 发送爱意</button>
-                    </div>
-                </div>
-                <div class="messages" id="messagesList">
-                    <!-- 留言将通过JavaScript动态加载 -->
-                    <div class="messages-placeholder">
-                        <div class="messages-placeholder-icon">💌</div>
-                        <p>还没有留言，快留下第一句爱的话语吧~</p>
-                    </div>
+        <!-- 天气信息部分 -->
+        <section id="weather-section" class="section">
+            <h2>🌤️ 今日天气</h2>
+            <div class="weather-container" id="weather-container">
+                <div class="weather-placeholder">
+                    <div class="weather-placeholder-icon">🌤️</div>
+                    <p>天气信息加载中，请稍候...</p>
                 </div>
             </div>
         </section>
@@ -113,78 +101,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
-    <script>
-        // 检查访问权限 - 必须通过验证才能访问
-        document.addEventListener('DOMContentLoaded', function() {
-            // 检查是否通过今日验证
-            const authData = JSON.parse(localStorage.getItem('love_auth_status') || 'null');
-            
-            if (!authData) {
-                // 没有验证记录，跳转到验证页面
-                window.location.href = 'auth.html';
-                return;
-            }
-            
-            const now = Math.floor(Date.now() / 1000);
-            const authTime = authData.timestamp;
-            const isValid = (now - authTime) < (24 * 60 * 60); // 24小时有效期
-            
-            // 检查是否是今天的验证
-            const today = new Date().toDateString();
-            const authDate = new Date(authTime * 1000).toDateString();
-            const isSameDay = today === authDate;
-            
-            if (!isValid || !isSameDay) {
-                // 验证已过期或不是今天的验证，重新验证
-                localStorage.removeItem('love_auth_status');
-                window.location.href = 'auth.html';
-                return;
-            }
-            
-            // 验证通过，显示欢迎消息
-            setTimeout(() => {
-                showWelcomeMessage();
-            }, 1000);
-        });
-        
-        // 显示欢迎消息
-        function showWelcomeMessage() {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 30px;
-                background: linear-gradient(45deg, #667eea, #764ba2);
-                color: white;
-                padding: 15px 25px;
-                border-radius: 15px;
-                font-weight: 500;
-                z-index: 3000;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-                transform: translateX(400px);
-                transition: transform 0.5s ease;
-                font-family: inherit;
-            `;
-            notification.innerHTML = '💕 欢迎回到我们的爱情世界！';
-            
-            document.body.appendChild(notification);
-            
-            // 滑入动画
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 100);
-            
-            // 3秒后消失
-            setTimeout(() => {
-                notification.style.transform = 'translateX(400px)';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        document.body.removeChild(notification);
-                    }
-                }, 500);
-            }, 3000);
-        }
-    </script>
+    <script src="script.js?v=2025010901"></script>
 </body>
 </html>

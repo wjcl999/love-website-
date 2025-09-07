@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // 设置文件上传
     setupFileUpload();
     
+    // 设置数据导入
+    setupDataImport();
+    
     console.log('🎉 Admin panel initialization complete');
 });
 
@@ -148,17 +151,28 @@ function showSection(sectionId) {
 
 // 加载所有数据
 function loadAllData() {
+    console.log('🔄 Loading all data...');
+    
     // 从questions.js加载问题数据
     if (typeof QUESTIONS_DATABASE !== 'undefined') {
         currentQuestions = [...QUESTIONS_DATABASE.questions];
         filteredQuestions = [...currentQuestions];
     }
     
+    // 加载各个模块的数据
+    loadQuestionsData();
+    loadImagesData();
+    loadTimelineData();
+    loadMessagesData();
+    loadSettingsData();
+    
     // 更新统计数据
     updateStats();
     
     // 记录今日访问
     recordTodayVisit();
+    
+    console.log('✅ All data loaded successfully');
 }
 
 // 更新统计数据
@@ -437,109 +451,8 @@ function saveQuestionsToStorage() {
 }
 
 // 加载图片数据
-function loadImagesData() {
-    const imagesGrid = document.getElementById('imagesGrid');
-    const images = getStorageItem(ADMIN_STORAGE_KEYS.IMAGES) || [];
-    
-    if (images.length === 0) {
-        imagesGrid.innerHTML = `
-            <div class="upload-placeholder">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <p>暂无图片，点击上传按钮添加照片</p>
-                <button class="btn btn-outline" onclick="showUploadModal()">开始上传</button>
-            </div>
-        `;
-        return;
-    }
-    
-    imagesGrid.innerHTML = '';
-    images.forEach(image => {
-        const imageItem = document.createElement('div');
-        imageItem.className = 'image-item';
-        imageItem.innerHTML = `
-            <img src="${image.url}" alt="${image.title}">
-            <div class="image-info">
-                <div class="image-title">${image.title}</div>
-                <div class="image-date">${image.date}</div>
-                <div style="margin-top: 10px;">
-                    <button class="btn btn-sm btn-outline" onclick="editImage('${image.id}')">编辑</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteImage('${image.id}')">删除</button>
-                </div>
-            </div>
-        `;
-        imagesGrid.appendChild(imageItem);
-    });
-}
 
 // 加载时光轴数据
-function loadTimelineData() {
-    const timelineList = document.getElementById('timelineList');
-    const timeline = getStorageItem(ADMIN_STORAGE_KEYS.TIMELINE) || [];
-    
-    if (timeline.length === 0) {
-        timelineList.innerHTML = `
-            <div style="text-align: center; padding: 60px; color: #999;">
-                <i class="fas fa-clock" style="font-size: 48px; margin-bottom: 20px; color: #ddd;"></i>
-                <p>暂无时光轴数据</p>
-                <button class="btn btn-outline" onclick="showAddTimelineModal()">添加第一个时刻</button>
-            </div>
-        `;
-        return;
-    }
-    
-    // 按日期排序
-    timeline.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    timelineList.innerHTML = '';
-    timeline.forEach(item => {
-        const timelineItem = document.createElement('div');
-        timelineItem.className = 'timeline-item';
-        timelineItem.innerHTML = `
-            <div class="timeline-date">${item.date}</div>
-            <div class="timeline-content">
-                <div class="timeline-title">${item.title}</div>
-                <div class="timeline-description">${item.description}</div>
-                <div style="margin-top: 15px;">
-                    <button class="btn btn-sm btn-outline" onclick="editTimeline('${item.id}')">编辑</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteTimeline('${item.id}')">删除</button>
-                </div>
-            </div>
-        `;
-        timelineList.appendChild(timelineItem);
-    });
-}
-
-// 加载留言数据
-function loadMessagesData() {
-    const messagesList = document.getElementById('messagesList');
-    const messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
-    
-    if (messages.length === 0) {
-        messagesList.innerHTML = `
-            <div style="text-align: center; padding: 60px; color: #999;">
-                <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 20px; color: #ddd;"></i>
-                <p>暂无留言数据</p>
-            </div>
-        `;
-        return;
-    }
-    
-    messagesList.innerHTML = '';
-    messages.forEach(message => {
-        const messageItem = document.createElement('div');
-        messageItem.className = 'message-item';
-        messageItem.innerHTML = `
-            <div class="message-header">
-                <div class="message-time">${message.time}</div>
-                <button class="btn btn-sm btn-danger" onclick="deleteMessage(${message.id})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="message-content">${escapeHtml(message.content)}</div>
-        `;
-        messagesList.appendChild(messageItem);
-    });
-}
 
 // 加载设置数据
 function loadSettingsData() {
@@ -1344,4 +1257,77 @@ function exportMessages() {
     
     URL.revokeObjectURL(url);
     showNotification('留言导出成功！', 'success');
+}
+
+// 设置数据导入功能
+function setupDataImport() {
+    const importFile = document.getElementById('importFile');
+    if (importFile) {
+        importFile.addEventListener('change', handleDataImport);
+    }
+}
+
+// 处理数据导入
+function handleDataImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            if (confirm('确定要导入数据吗？这将覆盖现有的所有数据！')) {
+                // 导入各类数据
+                if (importedData.questions) {
+                    setStorageItem(ADMIN_STORAGE_KEYS.QUESTIONS, importedData.questions);
+                    currentQuestions = importedData.questions;
+                }
+                if (importedData.images) {
+                    setStorageItem(ADMIN_STORAGE_KEYS.IMAGES, importedData.images);
+                }
+                if (importedData.timeline) {
+                    setStorageItem(ADMIN_STORAGE_KEYS.TIMELINE, importedData.timeline);
+                }
+                if (importedData.messages) {
+                    localStorage.setItem('loveMessages', JSON.stringify(importedData.messages));
+                }
+                if (importedData.settings) {
+                    setStorageItem(ADMIN_STORAGE_KEYS.SETTINGS, importedData.settings);
+                }
+                
+                // 重新加载数据
+                loadAllData();
+                showNotification('数据导入成功！', 'success');
+            }
+        } catch (error) {
+            console.error('导入数据失败:', error);
+            showNotification('数据导入失败，请检查文件格式！', 'error');
+        }
+    };
+    
+    reader.readAsText(file);
+    // 重置文件输入，允许重复导入同一文件
+    event.target.value = '';
+}
+
+// 重置所有数据
+function resetAllData() {
+    if (!confirm('确定要重置所有数据吗？此操作不可恢复！')) return;
+    
+    if (!confirm('请再次确认：这将删除所有问题、图片、时光轴、留言和设置数据！')) return;
+    
+    // 清空所有数据
+    Object.values(ADMIN_STORAGE_KEYS).forEach(key => {
+        localStorage.removeItem(key);
+    });
+    localStorage.removeItem('loveMessages');
+    
+    // 重置全局变量
+    currentQuestions = [];
+    filteredQuestions = [];
+    
+    // 重新加载数据
+    loadAllData();
+    showNotification('所有数据已重置！', 'success');
 }
