@@ -85,13 +85,19 @@
             <h2>💌 爱的留言</h2>
             <div class="message-container">
                 <div class="message-form">
-                    <textarea id="messageText" placeholder="写下想对TA说的话..."></textarea>
-                    <button onclick="addMessage()">💕 发送爱意</button>
+                    <textarea id="messageText" placeholder="写下想对TA说的话..." maxlength="500"></textarea>
+                    <div class="message-form-footer">
+                        <div class="char-count">
+                            <span id="charCount">0</span>/500
+                        </div>
+                        <button onclick="addMessage()">💕 发送爱意</button>
+                    </div>
                 </div>
                 <div class="messages" id="messagesList">
-                    <div class="message">
-                        <div class="message-content">每天和你在一起都是最幸福的时光 💕</div>
-                        <div class="message-time">2024-09-01</div>
+                    <!-- 留言将通过JavaScript动态加载 -->
+                    <div class="messages-placeholder">
+                        <div class="messages-placeholder-icon">💌</div>
+                        <p>还没有留言，快留下第一句爱的话语吧~</p>
                     </div>
                 </div>
             </div>

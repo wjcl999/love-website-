@@ -1014,6 +1014,115 @@ function deleteTimeline(timelineId) {
     showNotification('时光轴删除成功！', 'success');
 }
 
+// === 留言管理功能 ===
+
+// 加载留言数据
+function loadMessagesData() {
+    const messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
+    displayMessages(messages);
+    updateMessageStats(messages.length);
+}
+
+// 显示留言
+function displayMessages(messages) {
+    const container = document.getElementById('messagesList');
+    
+    if (messages.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-comments" style="font-size: 48px; color: #ccc; margin-bottom: 20px;"></i>
+                <p>还没有留言，等待用户的第一条爱的留言...</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // 按时间倒序排列
+    const sortedMessages = messages.sort((a, b) => new Date(b.time) - new Date(a.time));
+    
+    container.innerHTML = sortedMessages.map(msg => `
+        <div class="message-admin-item">
+            <div class="message-admin-content">
+                <p class="message-text">${msg.text}</p>
+                <div class="message-meta">
+                    <span class="message-date">💬 ${formatMessageDate(msg.time)}</span>
+                    <div class="message-actions">
+                        <button class="btn btn-sm btn-danger" onclick="deleteMessage('${msg.id}')">
+                            <i class="fas fa-trash"></i>
+                            删除
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 格式化留言日期
+function formatMessageDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+// 删除留言
+function deleteMessage(messageId) {
+    if (!confirm('确定要删除这条留言吗？')) return;
+    
+    const messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
+    const filtered = messages.filter(msg => msg.id !== messageId);
+    
+    localStorage.setItem('loveMessages', JSON.stringify(filtered));
+    loadMessagesData();
+    showNotification('留言删除成功！', 'success');
+}
+
+// 清空所有留言
+function clearAllMessages() {
+    if (!confirm('确定要清空所有留言吗？此操作不可恢复！')) return;
+    
+    localStorage.setItem('loveMessages', '[]');
+    loadMessagesData();
+    showNotification('所有留言已清空！', 'success');
+}
+
+// 导出留言
+function exportMessages() {
+    const messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
+    
+    if (messages.length === 0) {
+        showNotification('没有留言可导出', 'error');
+        return;
+    }
+    
+    const exportData = {
+        messages: messages,
+        exportTime: new Date().toISOString(),
+        totalCount: messages.length
+    };
+    
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `love-messages-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    
+    URL.revokeObjectURL(url);
+    showNotification('留言导出成功！', 'success');
+}
+
+// 更新留言统计
+function updateMessageStats(count) {
+    document.getElementById('totalMessages').textContent = count;
+}
+
 // 访问主站
 function visitMainSite() {
     window.open('index.html', '_blank');

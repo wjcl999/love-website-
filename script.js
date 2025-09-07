@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 加载时光轴数据
     loadTimelineData();
+    
+    // 加载留言数据
+    loadMessagesData();
+    
+    // 初始化留言输入
+    initMessageInput();
 });
 
 // 导航系统
@@ -1028,4 +1034,216 @@ function formatTimelineDate(dateString) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+}
+
+// === 留言功能 ===
+
+// 初始化留言输入
+function initMessageInput() {
+    const messageText = document.getElementById('messageText');
+    const charCount = document.getElementById('charCount');
+    
+    if (messageText && charCount) {
+        messageText.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.textContent = count;
+            
+            // 字符数接近限制时变色提醒
+            if (count > 450) {
+                charCount.style.color = '#ff6b6b';
+            } else if (count > 400) {
+                charCount.style.color = '#ffa726';
+            } else {
+                charCount.style.color = 'rgba(255, 255, 255, 0.7)';
+            }
+        });
+        
+        // 回车发送留言（Ctrl+Enter或Cmd+Enter）
+        messageText.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                addMessage();
+            }
+        });
+    }
+}
+
+// 加载留言数据
+function loadMessagesData() {
+    try {
+        const messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
+        displayMessages(messages);
+    } catch (error) {
+        console.error('加载留言数据失败:', error);
+        displayEmptyMessages();
+    }
+}
+
+// 显示留言
+function displayMessages(messages) {
+    const container = document.getElementById('messagesList');
+    
+    if (!container) return;
+    
+    if (messages.length === 0) {
+        displayEmptyMessages();
+        return;
+    }
+    
+    // 按时间倒序排列（最新的在上面）
+    const sortedMessages = messages.sort((a, b) => new Date(b.time) - new Date(a.time));
+    
+    container.innerHTML = sortedMessages.map((msg, index) => `
+        <div class="message fade-in-up delay-${index % 3}00" style="opacity: 0; transform: translateY(20px);">
+            <div class="message-content">${escapeHtml(msg.text)}</div>
+            <div class="message-time">${formatMessageTime(msg.time)}</div>
+        </div>
+    `).join('');
+    
+    // 触发渐入动画
+    setTimeout(() => {
+        container.querySelectorAll('.message').forEach((msg, index) => {
+            setTimeout(() => {
+                msg.style.transition = 'all 0.6s ease';
+                msg.style.opacity = '1';
+                msg.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }, 100);
+}
+
+// 显示空留言状态
+function displayEmptyMessages() {
+    const container = document.getElementById('messagesList');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="messages-placeholder">
+            <div class="messages-placeholder-icon">💌</div>
+            <p>还没有留言，快留下第一句爱的话语吧~</p>
+        </div>
+    `;
+}
+
+// 添加留言
+function addMessage() {
+    const messageText = document.getElementById('messageText');
+    
+    if (!messageText) return;
+    
+    const text = messageText.value.trim();
+    
+    if (!text) {
+        // 简单的提示动画
+        messageText.style.background = 'rgba(255, 107, 107, 0.1)';
+        messageText.placeholder = '请输入留言内容...';
+        setTimeout(() => {
+            messageText.style.background = '';
+            messageText.placeholder = '写下想对TA说的话...';
+        }, 2000);
+        return;
+    }
+    
+    if (text.length > 500) {
+        alert('留言内容不能超过500个字符');
+        return;
+    }
+    
+    // 获取现有留言
+    const messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
+    
+    // 创建新留言
+    const newMessage = {
+        id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        text: text,
+        time: new Date().toISOString()
+    };
+    
+    // 添加到列表
+    messages.push(newMessage);
+    
+    // 保存到localStorage
+    localStorage.setItem('loveMessages', JSON.stringify(messages));
+    
+    // 清空输入框
+    messageText.value = '';
+    document.getElementById('charCount').textContent = '0';
+    document.getElementById('charCount').style.color = 'rgba(255, 255, 255, 0.7)';
+    
+    // 重新加载显示
+    loadMessagesData();
+    
+    // 成功提示动画
+    showMessageSuccess();
+}
+
+// 显示留言成功动画
+function showMessageSuccess() {
+    // 创建临时成功提示
+    const successDiv = document.createElement('div');
+    successDiv.innerHTML = '💕 留言发送成功！';
+    successDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: bold;
+        z-index: 9999;
+        transform: translateX(300px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    `;
+    
+    document.body.appendChild(successDiv);
+    
+    // 显示动画
+    setTimeout(() => {
+        successDiv.style.transform = 'translateX(0)';
+        successDiv.style.opacity = '1';
+    }, 100);
+    
+    // 消失动画
+    setTimeout(() => {
+        successDiv.style.transform = 'translateX(300px)';
+        successDiv.style.opacity = '0';
+        setTimeout(() => {
+            if (successDiv.parentNode) {
+                document.body.removeChild(successDiv);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// 格式化留言时间
+function formatMessageTime(timeString) {
+    const date = new Date(timeString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) {
+        return '今天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    } else if (diffDays === 2) {
+        return '昨天 ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    } else if (diffDays <= 7) {
+        return `${diffDays - 1}天前`;
+    } else {
+        return date.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+    }
+}
+
+// HTML转义防XSS
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }
