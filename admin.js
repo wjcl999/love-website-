@@ -745,6 +745,162 @@ function refreshTodayQuestion() {
     }
 }
 
+// === 图片管理功能 ===
+
+// 加载图片数据
+function loadImagesData() {
+    const images = getStorageItem(ADMIN_STORAGE_KEYS.IMAGES) || [];
+    displayImages(images);
+    updateImageStats(images.length);
+}
+
+// 显示图片
+function displayImages(images) {
+    const container = document.getElementById('imagesGrid');
+    
+    if (images.length === 0) {
+        container.innerHTML = `
+            <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>暂无图片，点击上传按钮添加照片</p>
+                <button class="btn btn-outline" onclick="showUploadModal()">开始上传</button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = images.map(img => `
+        <div class="image-card" data-category="${img.category}">
+            <div class="image-preview">
+                <img src="${img.url || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDIwMCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjZjVmNWY1Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iNzUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5OTkiIGZvbnQtc2l6ZT0iMTZweCII+8J+T/CfkoY8L3RleHQ+Cjwvc3ZnPg=='}" alt="${img.description}">
+                <div class="image-overlay">
+                    <button class="btn-icon" onclick="viewImage('${img.id}')" title="查看">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-icon" onclick="editImage('${img.id}')" title="编辑">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon btn-danger" onclick="deleteImage('${img.id}')" title="删除">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="image-info">
+                <h4>${img.description || '无描述'}</h4>
+                <p class="image-category">${getCategoryName(img.category)}</p>
+                <p class="image-date">${img.date || '未知日期'}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 获取分类中文名
+function getCategoryName(category) {
+    const names = {
+        'first_date': '第一次约会',
+        'travel': '一起旅行', 
+        'daily_life': '日常生活',
+        'festivals': '节日庆祝'
+    };
+    return names[category] || '未分类';
+}
+
+// 保存图片
+function saveImages() {
+    const fileInput = document.getElementById('fileInput');
+    const category = document.getElementById('imageCategory').value;
+    const description = document.getElementById('imageDescription').value;
+    const date = document.getElementById('imageDate').value;
+    
+    if (!fileInput.files.length) {
+        showNotification('请选择要上传的图片', 'error');
+        return;
+    }
+    
+    if (!description.trim()) {
+        showNotification('请输入图片描述', 'error');
+        return;
+    }
+    
+    const images = getStorageItem(ADMIN_STORAGE_KEYS.IMAGES) || [];
+    
+    // 处理每个选中的文件
+    Array.from(fileInput.files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const newImage = {
+                    id: 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                    url: e.target.result, // 使用base64编码存储图片
+                    category: category,
+                    description: description,
+                    date: date || new Date().toISOString().split('T')[0],
+                    uploadTime: new Date().toISOString()
+                };
+                
+                images.push(newImage);
+                setStorageItem(ADMIN_STORAGE_KEYS.IMAGES, images);
+                
+                // 刷新显示
+                loadImagesData();
+                showNotification('图片上传成功！', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    // 清空表单并关闭模态框
+    document.getElementById('imageForm').reset();
+    document.getElementById('fileInput').value = '';
+    closeModal();
+}
+
+// 筛选相册
+function filterGallery() {
+    const category = document.getElementById('galleryFilter').value;
+    const images = getStorageItem(ADMIN_STORAGE_KEYS.IMAGES) || [];
+    
+    if (category === '') {
+        displayImages(images);
+    } else {
+        const filtered = images.filter(img => img.category === category);
+        displayImages(filtered);
+    }
+}
+
+// 搜索图片
+function searchImages() {
+    const query = document.getElementById('imageSearch').value.toLowerCase();
+    const images = getStorageItem(ADMIN_STORAGE_KEYS.IMAGES) || [];
+    
+    if (query === '') {
+        displayImages(images);
+    } else {
+        const filtered = images.filter(img => 
+            img.description.toLowerCase().includes(query) ||
+            getCategoryName(img.category).toLowerCase().includes(query)
+        );
+        displayImages(filtered);
+    }
+}
+
+// 删除图片
+function deleteImage(imageId) {
+    if (!confirm('确定要删除这张图片吗？')) return;
+    
+    const images = getStorageItem(ADMIN_STORAGE_KEYS.IMAGES) || [];
+    const filtered = images.filter(img => img.id !== imageId);
+    
+    setStorageItem(ADMIN_STORAGE_KEYS.IMAGES, filtered);
+    loadImagesData();
+    showNotification('图片删除成功！', 'success');
+}
+
+// 更新图片统计
+function updateImageStats(count) {
+    document.getElementById('totalImages').textContent = count;
+}
+
 // 访问主站
 function visitMainSite() {
     window.open('index.html', '_blank');

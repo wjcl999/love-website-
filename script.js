@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化页面动画
     initPageAnimations();
+    
+    // 加载相册数据
+    loadGalleryData();
 });
 
 // 导航系统
@@ -715,3 +718,238 @@ clickStyle.textContent = `
     }
 `;
 document.head.appendChild(clickStyle);
+
+// === 相册功能 ===
+
+// 当前显示的分类
+let currentGalleryCategory = 'all';
+
+// 加载相册数据
+function loadGalleryData() {
+    try {
+        const images = JSON.parse(localStorage.getItem('love_admin_images') || '[]');
+        displayGallery(images, currentGalleryCategory);
+    } catch (error) {
+        console.error('加载相册数据失败:', error);
+        // 显示占位提示
+        displayEmptyGallery();
+    }
+}
+
+// 显示相册
+function displayGallery(images, category = 'all') {
+    const gallery = document.getElementById('photoGallery');
+    
+    if (!gallery) return;
+    
+    // 过滤图片
+    let filteredImages = images;
+    if (category !== 'all') {
+        filteredImages = images.filter(img => img.category === category);
+    }
+    
+    if (filteredImages.length === 0) {
+        displayEmptyGallery();
+        return;
+    }
+    
+    // 生成图片HTML
+    gallery.innerHTML = filteredImages.map((img, index) => `
+        <div class="photo-item photo-zoom glow-on-hover fade-in-up delay-${index % 4}00" 
+             onclick="openPhotoModal('${img.id}')">
+            <img src="${img.url}" alt="${img.description}" 
+                 style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px;">
+            <p>${img.description}</p>
+            <small style="color: rgba(255,255,255,0.8);">${img.date}</small>
+        </div>
+    `).join('');
+    
+    // 重新触发动画
+    setTimeout(() => {
+        gallery.querySelectorAll('.photo-item').forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(30px)';
+            setTimeout(() => {
+                item.style.transition = 'all 0.6s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    }, 100);
+}
+
+// 显示空相册提示
+function displayEmptyGallery() {
+    const gallery = document.getElementById('photoGallery');
+    if (!gallery) return;
+    
+    gallery.innerHTML = `
+        <div class="photo-placeholder-hint">
+            <div class="photo-placeholder">📷</div>
+            <p>还没有照片，快去管理后台上传吧~</p>
+        </div>
+    `;
+}
+
+// 显示相册分类
+function showGalleryCategory(category) {
+    // 更新按钮状态
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-category="${category}"]`).classList.add('active');
+    
+    // 保存当前分类
+    currentGalleryCategory = category;
+    
+    // 重新加载数据
+    loadGalleryData();
+}
+
+// 打开照片模态框
+function openPhotoModal(imageId) {
+    try {
+        const images = JSON.parse(localStorage.getItem('love_admin_images') || '[]');
+        const image = images.find(img => img.id === imageId);
+        
+        if (!image) return;
+        
+        // 创建模态框HTML
+        const modalHtml = `
+            <div id="photoModalOverlay" class="photo-modal-overlay" onclick="closePhotoModal()">
+                <div class="photo-modal-content" onclick="event.stopPropagation()">
+                    <span class="photo-modal-close" onclick="closePhotoModal()">&times;</span>
+                    <img src="${image.url}" alt="${image.description}" class="modal-photo">
+                    <div class="photo-modal-info">
+                        <h3>${image.description}</h3>
+                        <p class="photo-date">📅 ${image.date}</p>
+                        <p class="photo-category">📂 ${getCategoryDisplayName(image.category)}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // 添加到页面
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // 添加动画
+        const overlay = document.getElementById('photoModalOverlay');
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+            overlay.querySelector('.photo-modal-content').style.transform = 'scale(1)';
+        }, 10);
+        
+    } catch (error) {
+        console.error('打开照片模态框失败:', error);
+    }
+}
+
+// 关闭照片模态框
+function closePhotoModal() {
+    const overlay = document.getElementById('photoModalOverlay');
+    if (overlay) {
+        overlay.style.opacity = '0';
+        overlay.querySelector('.photo-modal-content').style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            overlay.remove();
+        }, 300);
+    }
+}
+
+// 获取分类显示名称
+function getCategoryDisplayName(category) {
+    const names = {
+        'first_date': '第一次约会',
+        'travel': '一起旅行',
+        'daily_life': '日常生活',
+        'festivals': '节日庆祝'
+    };
+    return names[category] || '未分类';
+}
+
+// 添加相册模态框样式
+const galleryModalStyle = document.createElement('style');
+galleryModalStyle.textContent = `
+    .photo-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+    
+    .photo-modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        position: relative;
+        transform: scale(0.8);
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .modal-photo {
+        max-width: 100%;
+        max-height: 70vh;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    .photo-modal-close {
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .photo-modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+    
+    .photo-modal-info {
+        color: white;
+        margin-top: 20px;
+    }
+    
+    .photo-modal-info h3 {
+        margin-bottom: 10px;
+        font-size: 24px;
+    }
+    
+    .photo-date, .photo-category {
+        margin: 5px 0;
+        opacity: 0.8;
+    }
+    
+    @media (max-width: 768px) {
+        .photo-modal-close {
+            top: -30px;
+            right: -10px;
+            font-size: 24px;
+            width: 30px;
+            height: 30px;
+        }
+        
+        .photo-modal-info h3 {
+            font-size: 20px;
+        }
+    }
+`;
+document.head.appendChild(galleryModalStyle);
