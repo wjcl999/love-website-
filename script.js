@@ -474,11 +474,9 @@ document.addEventListener('DOMContentLoaded', function() {
 function openTimelineImage(imageUrl, caption) {
     const modal = document.getElementById('photoModal');
     const modalPhoto = document.getElementById('modalPhoto');
-    const modalCaption = document.getElementById('modalCaption');
     
-    if (modal && modalPhoto && modalCaption) {
+    if (modal && modalPhoto) {
         modalPhoto.innerHTML = `<img src="${imageUrl}" alt="${caption}">`;
-        modalCaption.textContent = caption;
         modal.style.display = 'flex';
         modal.style.animation = 'fadeIn 0.3s ease-out';
     }
