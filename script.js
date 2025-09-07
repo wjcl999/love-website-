@@ -139,8 +139,9 @@ const GALLERY_DATA = {
 
 // 天气API配置 - 使用和风天气API（国内访问更稳定）
 const WEATHER_CONFIG = {
-    apiKey: '6a4891b3a5744a9a8d6ee1feb42d55c2',
+    apiKey: '80162660f80c4323b6ccc00c85440068',
     apiHost: 'devapi.qweather.com', // 免费版API Host
+    credential: 'CNPKEFEQRA', // API凭据
     cities: [
         { 
             code: '101120801', 
