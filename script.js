@@ -39,7 +39,10 @@ const TIMELINE_DATA = [
         title: '第一次见面 💖',
         description: '等了这么久，终于见到真正的你！第一次拥抱，第一次亲吻，一切都那么美好而紧张...',
         icon: '💖',
-        image: ''
+        images: [
+            'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/cdd37313e374d91e5782bf2207671c35.jpg',
+            'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/f5ce1f2de1d47001e39504513edf9aae.jpg'
+        ]
     },
     {
         date: '2024-07-22',
@@ -331,6 +334,26 @@ function loadStaticTimeline() {
             `;
             
             timelineContainer.appendChild(timelineImage);
+        }
+        
+        // 如果有多张图片，在对侧横向排列缩略图
+        if (item.images) {
+            const timelineImages = document.createElement('div');
+            timelineImages.className = 'timeline-image-item';
+            timelineImages.style.animationDelay = (index * 0.2 + 0.1) + 's';
+            
+            const imagesHtml = item.images.map(imageUrl => `
+                <div class="timeline-image-wrapper horizontal" onclick="openTimelineImage('${imageUrl}', '${item.title}')" ontouchstart="">
+                    <img src="${imageUrl}" alt="${item.title}">
+                    <div class="image-overlay">
+                        <i class="fas fa-search-plus"></i>
+                    </div>
+                </div>
+            `).join('');
+            
+            timelineImages.innerHTML = `<div class="timeline-images-horizontal">${imagesHtml}</div>`;
+            
+            timelineContainer.appendChild(timelineImages);
         }
     });
 }
