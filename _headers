@@ -1,4 +1,4 @@
-# HTTP Headers Configuration for Cloudflare Pages
+# HTTP Headers Configuration for Cloudflare Pages - 完全禁用缓存
 
 # Global headers for all files
 /*
@@ -9,33 +9,41 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   
-  # Performance headers
-  Cache-Control: public, max-age=31536000
+  # 完全禁用缓存 - 解决更新不生效问题
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
   
   # Custom headers
   X-Powered-By: Love ❤️
 
-# HTML files - shorter cache for dynamic content
+# HTML files - 完全不缓存
 /*.html
-  Cache-Control: public, max-age=3600
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
   Content-Type: text/html; charset=utf-8
 
-# CSS files - long cache with immutable
+# CSS files - 完全不缓存
 /*.css
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
   Content-Type: text/css; charset=utf-8
 
-# JavaScript files - long cache with immutable
+# JavaScript files - 完全不缓存
 /*.js
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
   Content-Type: application/javascript; charset=utf-8
 
-# Enable gzip compression for better performance
-/*.html
-  Content-Encoding: gzip
+# 图片文件也不缓存
+/*.jpg
+  Cache-Control: no-cache, no-store, must-revalidate
 
-/*.css
-  Content-Encoding: gzip
-  
-/*.js
-  Content-Encoding: gzip
+/*.png  
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/*.gif
+  Cache-Control: no-cache, no-store, must-revalidate
