@@ -1003,7 +1003,7 @@ body {
     font-size: 12px;
 }
 
-/* 天气占位符样式 */
+/* 天气占位符和错误样式 */
 .weather-placeholder {
     text-align: center;
     color: rgba(255, 255, 255, 0.7);
@@ -1013,6 +1013,25 @@ body {
     font-size: 80px;
     margin-bottom: 20px;
     opacity: 0.7;
+}
+
+.forecast-unavailable {
+    text-align: center;
+    padding: 30px 20px;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.forecast-unavailable p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.forecast-unavailable p:first-child {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 @keyframes float {
