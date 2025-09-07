@@ -21,7 +21,7 @@ const COUPLE_INFO = {
 // 重要时刻数据 - 奕铭 & 佳怡 的美好回忆
 const TIMELINE_DATA = [
     {
-        date: '2024-01-18',
+        date: '2024-01-16',
         title: '初次相识 ✨',
         description: '命运让我们在这一天相遇，从此我的世界多了一个你，一切都变得不一样了...',
         icon: '✨',
@@ -303,17 +303,35 @@ function loadStaticTimeline() {
             day: 'numeric'
         });
         
+        // 创建主要内容
         timelineItem.innerHTML = `
             <div class="timeline-date">${formattedDate}</div>
             <div class="timeline-content">
                 <div class="timeline-icon">${item.icon}</div>
                 <h3>${item.title}</h3>
                 <p>${item.description}</p>
-                ${item.image ? `<img src="${item.image}" alt="${item.title}" class="timeline-image">` : ''}
             </div>
         `;
         
         timelineContainer.appendChild(timelineItem);
+        
+        // 如果有图片，在对侧添加缩略图
+        if (item.image) {
+            const timelineImage = document.createElement('div');
+            timelineImage.className = 'timeline-image-item';
+            timelineImage.style.animationDelay = (index * 0.2 + 0.1) + 's';
+            
+            timelineImage.innerHTML = `
+                <div class="timeline-image-wrapper">
+                    <img src="${item.image}" alt="${item.title}" onclick="openTimelineImage('${item.image}', '${item.title}')">
+                    <div class="image-overlay">
+                        <i class="fas fa-search-plus"></i>
+                    </div>
+                </div>
+            `;
+            
+            timelineContainer.appendChild(timelineImage);
+        }
     });
 }
 
@@ -414,6 +432,20 @@ function closeModal() {
         setTimeout(() => {
             modal.style.display = 'none';
         }, 300);
+    }
+}
+
+// 时光轴图片放大功能
+function openTimelineImage(imageUrl, caption) {
+    const modal = document.getElementById('photoModal');
+    const modalPhoto = document.getElementById('modalPhoto');
+    const modalCaption = document.getElementById('modalCaption');
+    
+    if (modal && modalPhoto && modalCaption) {
+        modalPhoto.innerHTML = `<img src="${imageUrl}" alt="${caption}">`;
+        modalCaption.textContent = caption;
+        modal.style.display = 'flex';
+        modal.style.animation = 'fadeIn 0.3s ease-out';
     }
 }
 
