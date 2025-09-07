@@ -137,10 +137,11 @@ const GALLERY_DATA = {
     ]
 };
 
-// 天气API配置 - 使用免费的OpenWeatherMap API
+// 天气API配置 - 使用和风天气API（国内访问更稳定）
 const WEATHER_CONFIG = {
-    apiKey: 'your_api_key_here', // 需要替换为真实的API密钥
-    city: 'Shanghai', // 默认城市
+    apiKey: 'your_api_key_here', // 需要替换为和风天气API密钥
+    city: '101020100', // 城市代码，上海为101020100，北京为101010100
+    cityName: '上海', // 城市中文名显示用
     enabled: false // 如果有API密钥，改为true
 };
 
@@ -501,12 +502,17 @@ function initWeather() {
 function fetchWeather() {
     if (!WEATHER_CONFIG.enabled) return;
     
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${WEATHER_CONFIG.city}&appid=${WEATHER_CONFIG.apiKey}&units=metric&lang=zh_cn`;
+    // 和风天气API - 免费版本，每天1000次请求
+    const apiUrl = `https://devapi.qweather.com/v7/weather/now?location=${WEATHER_CONFIG.city}&key=${WEATHER_CONFIG.apiKey}`;
     
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            displayWeather(data);
+            if (data.code === '200') {
+                displayWeather(data.now);
+            } else {
+                console.log('天气获取失败:', data.code);
+            }
         })
         .catch(error => {
             console.log('天气获取失败:', error);
@@ -518,16 +524,22 @@ function displayWeather(weatherData) {
     const weatherContainer = document.getElementById('weather-container');
     if (!weatherContainer) return;
     
-    const temp = Math.round(weatherData.main.temp);
-    const description = weatherData.weather[0].description;
-    const icon = weatherData.weather[0].icon;
+    const temp = Math.round(weatherData.temp);
+    const description = weatherData.text;
+    
+    // 天气图标映射
+    const weatherIcons = {
+        '晴': '☀️', '多云': '⛅', '阴': '☁️', '小雨': '🌦️', '中雨': '🌧️', 
+        '大雨': '⛈️', '雪': '❄️', '雾': '🌫️', '霾': '😷'
+    };
+    const icon = weatherIcons[description] || '🌤️';
     
     weatherContainer.innerHTML = `
         <div class="weather-info">
-            <img src="https://openweathermap.org/img/w/${icon}.png" alt="${description}">
+            <div class="weather-icon">${icon}</div>
             <span class="temperature">${temp}°C</span>
             <span class="description">${description}</span>
-            <span class="location">${WEATHER_CONFIG.city}</span>
+            <span class="location">${WEATHER_CONFIG.cityName}</span>
         </div>
     `;
 }
