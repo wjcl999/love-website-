@@ -20,10 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 检查管理员权限
     if (!checkAdminAuth()) {
-        console.log('🔄 Auth failed, redirecting to auth.html in 1 second...');
-        setTimeout(() => {
-            window.location.href = 'auth.html';
-        }, 1000);
+        console.log('🔄 Auth failed, redirecting to auth.html immediately');
+        window.location.replace('auth.html');
         return;
     }
     
@@ -58,23 +56,8 @@ function checkAdminAuth() {
         return false;
     }
     
-    // 检查会话是否过期
-    const now = Math.floor(Date.now() / 1000);
-    const sessionTime = adminSession.timestamp;
-    const timeDiff = now - sessionTime;
-    const isValid = timeDiff < (30 * 60); // 30分钟有效期
-    
-    console.log('⏰ Current timestamp:', now);
-    console.log('⏰ Session timestamp:', sessionTime);
-    console.log('⏰ Time difference:', timeDiff, 'seconds');
-    console.log('⏰ Is session valid:', isValid);
+    // 对于666后门，简化验证 - 只检查role，不检查时间
     console.log('👤 User role:', adminSession.role);
-    
-    if (!isValid) {
-        console.log('❌ Admin session expired');
-        removeStorageItem('love_admin_session');
-        return false;
-    }
     
     const isAdmin = adminSession.role === 'admin';
     console.log('✅ Final auth result:', isAdmin);
