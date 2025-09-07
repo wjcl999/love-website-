@@ -515,18 +515,28 @@ async function fetchAllWeatherData() {
     try {
         for (const city of WEATHER_CONFIG.cities) {
             // 获取实时天气
-            const nowResponse = await fetch(`https://devapi.qweather.com/v7/weather/now?location=${city.code}&key=${WEATHER_CONFIG.apiKey}`);
+            const nowResponse = await fetch(`https://devapi.qweather.com/v7/weather/now?location=${city.code}&key=${WEATHER_CONFIG.apiKey}&lang=zh`);
             const nowData = await nowResponse.json();
             
             // 获取3天预报
-            const forecastResponse = await fetch(`https://devapi.qweather.com/v7/weather/3d?location=${city.code}&key=${WEATHER_CONFIG.apiKey}`);
+            const forecastResponse = await fetch(`https://devapi.qweather.com/v7/weather/3d?location=${city.code}&key=${WEATHER_CONFIG.apiKey}&lang=zh`);
             const forecastData = await forecastResponse.json();
+            
+            console.log(`${city.name} 实时天气:`, nowData);
+            console.log(`${city.name} 预报天气:`, forecastData);
             
             if (nowData.code === '200' && forecastData.code === '200') {
                 weatherData[city.name] = {
                     now: nowData.now,
                     forecast: forecastData.daily
                 };
+            } else {
+                console.error(`天气数据获取失败 - ${city.name}:`, {
+                    nowCode: nowData.code,
+                    forecastCode: forecastData.code,
+                    nowMessage: nowData.code !== '200' ? nowData : null,
+                    forecastMessage: forecastData.code !== '200' ? forecastData : null
+                });
             }
         }
         displayWeather();
