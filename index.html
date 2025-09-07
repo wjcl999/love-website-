@@ -77,22 +77,21 @@
         <!-- 相册部分 -->
         <section id="gallery-section" class="section">
             <h2>📸 甜蜜回忆</h2>
-            <div class="gallery">
-                <div class="photo-item photo-zoom glow-on-hover fade-in-up" onclick="openModal('photo1')">
-                    <div class="photo-placeholder rotate-infinite">📷</div>
-                    <p>第一次约会</p>
-                </div>
-                <div class="photo-item photo-zoom glow-on-hover fade-in-up delay-100" onclick="openModal('photo2')">
+            
+            <!-- 相册分类导航 -->
+            <div class="gallery-tabs">
+                <button class="tab-btn active" data-category="all" onclick="showGalleryCategory('all')">全部</button>
+                <button class="tab-btn" data-category="first_date" onclick="showGalleryCategory('first_date')">第一次约会</button>
+                <button class="tab-btn" data-category="travel" onclick="showGalleryCategory('travel')">一起旅行</button>
+                <button class="tab-btn" data-category="daily_life" onclick="showGalleryCategory('daily_life')">日常生活</button>
+                <button class="tab-btn" data-category="festivals" onclick="showGalleryCategory('festivals')">节日庆祝</button>
+            </div>
+            
+            <div class="gallery" id="photoGallery">
+                <!-- 照片将通过JavaScript动态加载 -->
+                <div class="photo-placeholder-hint">
                     <div class="photo-placeholder">📷</div>
-                    <p>一起旅行</p>
-                </div>
-                <div class="photo-item photo-zoom glow-on-hover fade-in-up delay-200" onclick="openModal('photo3')">
-                    <div class="photo-placeholder">📷</div>
-                    <p>日常生活</p>
-                </div>
-                <div class="photo-item photo-zoom glow-on-hover fade-in-up delay-300" onclick="openModal('photo4')">
-                    <div class="photo-placeholder">📷</div>
-                    <p>节日庆祝</p>
+                    <p>还没有照片，快去管理后台上传吧~</p>
                 </div>
             </div>
         </section>

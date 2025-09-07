@@ -231,6 +231,25 @@
                     </button>
                 </div>
 
+                <div class="filters">
+                    <select id="galleryFilter" onchange="filterGallery()">
+                        <option value="">全部相册</option>
+                        <option value="first_date">第一次约会</option>
+                        <option value="travel">一起旅行</option>
+                        <option value="daily_life">日常生活</option>
+                        <option value="festivals">节日庆祝</option>
+                    </select>
+                    
+                    <div class="search-box">
+                        <input type="text" id="imageSearch" placeholder="搜索图片..." onkeyup="searchImages()">
+                        <i class="fas fa-search"></i>
+                    </div>
+                </div>
+
+                <div class="gallery-categories" id="galleryCategories">
+                    <!-- 相册分类将通过JS动态生成 -->
+                </div>
+
                 <div class="images-grid" id="imagesGrid">
                     <div class="upload-placeholder">
                         <i class="fas fa-cloud-upload-alt"></i>
@@ -406,6 +425,25 @@
                 <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
+                <form id="imageForm">
+                    <div class="form-group">
+                        <label>选择相册分类</label>
+                        <select id="imageCategory">
+                            <option value="first_date">第一次约会</option>
+                            <option value="travel">一起旅行</option>
+                            <option value="daily_life">日常生活</option>
+                            <option value="festivals">节日庆祝</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>图片描述</label>
+                        <input type="text" id="imageDescription" placeholder="为这张照片写个描述...">
+                    </div>
+                    <div class="form-group">
+                        <label>拍摄日期</label>
+                        <input type="date" id="imageDate">
+                    </div>
+                </form>
                 <div class="upload-area" onclick="document.getElementById('fileInput').click()">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <p>点击选择文件或拖拽文件到此处</p>
@@ -417,6 +455,10 @@
                     </div>
                     <span class="progress-text">0%</span>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveImages()">保存图片</button>
             </div>
         </div>
     </div>
