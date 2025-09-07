@@ -140,9 +140,20 @@ const GALLERY_DATA = {
 // 天气API配置 - 使用和风天气API（国内访问更稳定）
 const WEATHER_CONFIG = {
     apiKey: '6a4891b3a5744a9a8d6ee1feb42d55c2',
+    apiHost: 'devapi.qweather.com', // 免费版API Host
     cities: [
-        { code: '101120801', name: '淄博' },
-        { code: '101250101', name: '长沙' }
+        { 
+            code: '101120801', 
+            name: '淄博',
+            lat: 36.81,
+            lon: 118.05
+        },
+        { 
+            code: '101250101', 
+            name: '长沙',
+            lat: 28.23,
+            lon: 112.94
+        }
     ],
     enabled: true
 };
@@ -489,9 +500,9 @@ function openTimelineImage(imageUrl, caption) {
     }
 }
 
-// 天气功能
+// 天气功能 - 全功能版本
 let weatherData = {};
-let currentWeatherView = 'current'; // current, forecast
+let currentWeatherView = 'current'; // current, forecast, warning, indices, air
 
 function initWeather() {
     if (!WEATHER_CONFIG.enabled || !WEATHER_CONFIG.apiKey) {
@@ -504,66 +515,167 @@ function initWeather() {
     setInterval(fetchAllWeatherData, 30 * 60 * 1000);
 }
 
+// API请求助手函数
+async function makeWeatherRequest(endpoint, params = {}) {
+    const url = new URL(`https://${WEATHER_CONFIG.apiHost}${endpoint}`);
+    
+    // 添加通用参数
+    url.searchParams.append('key', WEATHER_CONFIG.apiKey);
+    url.searchParams.append('lang', 'zh');
+    url.searchParams.append('unit', 'm'); // 公制单位
+    
+    // 添加自定义参数
+    Object.keys(params).forEach(key => {
+        url.searchParams.append(key, params[key]);
+    });
+    
+    const response = await fetch(url.toString());
+    return response.json();
+}
+
 async function fetchAllWeatherData() {
     if (!WEATHER_CONFIG.enabled) return;
     
     const weatherContainer = document.getElementById('weather-container');
     if (!weatherContainer) return;
     
-    weatherContainer.innerHTML = '<div class="weather-loading">🌤️ 加载天气信息中...</div>';
+    weatherContainer.innerHTML = '<div class="weather-loading">🌤️ 正在获取全面天气信息...</div>';
     
     try {
         for (const city of WEATHER_CONFIG.cities) {
-            // 仅获取实时天气 (免费版限制)
-            const nowResponse = await fetch(`https://devapi.qweather.com/v7/weather/now?location=${city.code}&key=${WEATHER_CONFIG.apiKey}`);
-            console.log(`${city.name} API响应状态:`, nowResponse.status);
+            console.log(`正在获取${city.name}天气数据...`);
             
-            if (nowResponse.status === 200) {
-                const nowData = await nowResponse.json();
-                console.log(`${city.name} 实时天气:`, nowData);
+            // 并行获取多种天气数据
+            const [nowData, forecast3d, forecast7d, warningData, indicesData, airData] = await Promise.allSettled([
+                // 实时天气
+                makeWeatherRequest('/v7/weather/now', { location: city.code }),
                 
-                if (nowData.code === '200') {
-                    weatherData[city.name] = {
-                        now: nowData.now,
-                        forecast: null // 暂时禁用预报功能
-                    };
-                } else {
-                    console.error(`${city.name} API返回错误:`, nowData);
-                }
-            } else {
-                console.error(`${city.name} HTTP错误:`, nowResponse.status);
-                // 如果API失败，显示模拟数据
-                weatherData[city.name] = {
-                    now: {
-                        temp: city.name === '淄博' ? 12 : 15,
-                        text: '晴',
-                        humidity: 65,
-                        windDir: '北',
-                        windScale: 3
-                    },
-                    forecast: null
-                };
-            }
+                // 3天预报
+                makeWeatherRequest('/v7/weather/3d', { location: city.code }),
+                
+                // 7天预报  
+                makeWeatherRequest('/v7/weather/7d', { location: city.code }),
+                
+                // 天气预警
+                makeWeatherRequest('/v7/warning/now', { location: city.code }),
+                
+                // 生活指数（运动、洗车、穿衣、感冒、紫外线等）
+                makeWeatherRequest('/v7/indices/1d', { 
+                    location: city.code,
+                    type: '1,2,3,9,5' // 运动、洗车、穿衣、感冒、紫外线
+                }),
+                
+                // 空气质量
+                fetch(`https://${WEATHER_CONFIG.apiHost}/v7/air/now?location=${city.code}&key=${WEATHER_CONFIG.apiKey}`)
+                    .then(res => res.json())
+                    .catch(() => null)
+            ]);
+            
+            // 处理数据
+            const cityWeatherData = {
+                city: city,
+                now: nowData.status === 'fulfilled' && nowData.value.code === '200' ? nowData.value.now : null,
+                forecast3d: forecast3d.status === 'fulfilled' && forecast3d.value.code === '200' ? forecast3d.value.daily : null,
+                forecast7d: forecast7d.status === 'fulfilled' && forecast7d.value.code === '200' ? forecast7d.value.daily : null,
+                warning: warningData.status === 'fulfilled' && warningData.value.code === '200' ? warningData.value.warning : [],
+                indices: indicesData.status === 'fulfilled' && indicesData.value.code === '200' ? indicesData.value.daily : [],
+                air: airData.status === 'fulfilled' && airData.value && airData.value.code === '200' ? airData.value.now : null
+            };
+            
+            weatherData[city.name] = cityWeatherData;
+            
+            // 调试信息
+            console.log(`${city.name} 数据获取完成:`, {
+                now: !!cityWeatherData.now,
+                forecast3d: !!cityWeatherData.forecast3d,
+                forecast7d: !!cityWeatherData.forecast7d,
+                warning: cityWeatherData.warning.length,
+                indices: cityWeatherData.indices.length,
+                air: !!cityWeatherData.air
+            });
         }
+        
         displayWeather();
+        
     } catch (error) {
-        console.log('天气获取失败:', error);
+        console.error('天气获取失败:', error);
+        
         // 显示模拟数据作为后备
-        WEATHER_CONFIG.cities.forEach(city => {
+        WEATHER_CONFIG.cities.forEach((city, index) => {
             weatherData[city.name] = {
+                city: city,
                 now: {
-                    temp: city.name === '淄博' ? 12 : 15,
-                    text: '晴',
+                    temp: index === 0 ? 8 : 12,
+                    text: index === 0 ? '多云' : '晴',
                     humidity: 65,
-                    windDir: '北',
-                    windScale: 3
+                    windDir: '北风',
+                    windScale: '3',
+                    feelsLike: index === 0 ? 5 : 15,
+                    pressure: 1013,
+                    vis: 16
                 },
-                forecast: null
+                forecast3d: createMockForecast(3),
+                forecast7d: createMockForecast(7),
+                warning: [],
+                indices: createMockIndices(),
+                air: {
+                    aqi: index === 0 ? 85 : 62,
+                    category: index === 0 ? '良' : '优',
+                    primary: 'PM2.5'
+                }
             };
         });
+        
         displayWeather();
-        weatherContainer.innerHTML = '<div class="weather-error">⚠️ 使用模拟天气数据</div>';
+        
+        // 显示友好提示
+        setTimeout(() => {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'weather-api-notice';
+            errorDiv.innerHTML = '⚠️ 当前使用模拟数据展示，实际部署时需配置API权限';
+            weatherContainer.appendChild(errorDiv);
+        }, 1000);
     }
+}
+
+// 创建模拟预报数据
+function createMockForecast(days) {
+    const forecast = [];
+    const today = new Date();
+    const temps = [8, 12, 15, 18, 22, 19, 16, 13];
+    const weathers = ['晴', '多云', '阴', '小雨', '晴', '多云', '晴', '阴'];
+    
+    for (let i = 0; i < days; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
+        
+        forecast.push({
+            fxDate: date.toISOString().split('T')[0],
+            tempMax: temps[i] + 5,
+            tempMin: temps[i] - 2,
+            textDay: weathers[i],
+            textNight: weathers[i],
+            windDirDay: '北风',
+            windScaleDay: '3-4',
+            humidity: 65 + (i * 2),
+            uvIndex: i < 3 ? 6 : 4,
+            sunrise: '06:30',
+            sunset: '18:00'
+        });
+    }
+    
+    return forecast;
+}
+
+// 创建模拟生活指数数据
+function createMockIndices() {
+    return [
+        { type: '1', name: '运动指数', level: '2', category: '较适宜', text: '天气较好，适宜进行各项运动' },
+        { type: '2', name: '洗车指数', level: '1', category: '适宜', text: '天气较好，适合洗车' },
+        { type: '3', name: '穿衣指数', level: '3', category: '较冷', text: '建议着厚外套加毛衣等服装' },
+        { type: '9', name: '感冒指数', level: '2', category: '较易发', text: '天气转凉，注意预防感冒' },
+        { type: '5', name: '紫外线指数', level: '3', category: '中等', text: '外出需要防晒措施' }
+    ];
 }
 
 function displayWeather() {
@@ -580,90 +692,280 @@ function displayWeather() {
     let weatherHtml = `
         <div class="weather-widget">
             <div class="weather-tabs">
-                <button class="weather-tab ${currentWeatherView === 'current' ? 'active' : ''}" onclick="switchWeatherView('current')">实时天气</button>
-                <button class="weather-tab ${currentWeatherView === 'forecast' ? 'active' : ''}" onclick="switchWeatherView('forecast')">三天预报</button>
+                <button class="weather-tab ${currentWeatherView === 'current' ? 'active' : ''}" onclick="switchWeatherView('current')">实时</button>
+                <button class="weather-tab ${currentWeatherView === 'forecast' ? 'active' : ''}" onclick="switchWeatherView('forecast')">预报</button>
+                <button class="weather-tab ${currentWeatherView === 'warning' ? 'active' : ''}" onclick="switchWeatherView('warning')">预警</button>
+                <button class="weather-tab ${currentWeatherView === 'indices' ? 'active' : ''}" onclick="switchWeatherView('indices')">指数</button>
+                <button class="weather-tab ${currentWeatherView === 'air' ? 'active' : ''}" onclick="switchWeatherView('air')">空气</button>
             </div>
             <div class="weather-content">
     `;
     
-    if (currentWeatherView === 'current') {
-        // 实时天气显示
-        weatherHtml += '<div class="weather-cities">';
-        WEATHER_CONFIG.cities.forEach(city => {
-            const data = weatherData[city.name];
-            if (data && data.now) {
-                const temp = Math.round(data.now.temp);
-                const description = data.now.text;
-                const icon = weatherIcons[description] || '🌤️';
-                const humidity = data.now.humidity;
-                const windDir = data.now.windDir;
-                const windScale = data.now.windScale;
-                
-                weatherHtml += `
-                    <div class="weather-city-card">
-                        <h3 class="city-name">${city.name}</h3>
-                        <div class="weather-main">
-                            <div class="weather-icon">${icon}</div>
-                            <div class="temperature">${temp}°C</div>
-                        </div>
-                        <div class="weather-desc">${description}</div>
-                        <div class="weather-details">
-                            <span>💧 湿度 ${humidity}%</span>
-                            <span>💨 ${windDir}风 ${windScale}级</span>
-                        </div>
-                    </div>
-                `;
-            }
-        });
-        weatherHtml += '</div>';
-    } else {
-        // 预报天气显示
-        weatherHtml += '<div class="weather-forecast">';
-        WEATHER_CONFIG.cities.forEach(city => {
-            const data = weatherData[city.name];
-            if (data && data.forecast) {
-                weatherHtml += `<div class="forecast-city">
-                    <h3 class="city-name">${city.name}</h3>
-                    <div class="forecast-days">`;
-                
-                data.forecast.slice(0, 3).forEach((day, index) => {
-                    const date = new Date(day.fxDate);
-                    const dayName = index === 0 ? '今天' : (index === 1 ? '明天' : '后天');
-                    const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-                    const icon = weatherIcons[day.textDay] || '🌤️';
-                    
-                    weatherHtml += `
-                        <div class="forecast-day">
-                            <div class="day-info">
-                                <span class="day-name">${dayName}</span>
-                                <span class="day-date">${dateStr}</span>
-                            </div>
-                            <div class="day-weather">
-                                <div class="day-icon">${icon}</div>
-                                <div class="day-temp">${day.tempMin}°-${day.tempMax}°</div>
-                                <div class="day-desc">${day.textDay}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                weatherHtml += '</div></div>';
-            } else {
-                // 没有预报数据时显示提示
-                weatherHtml += `<div class="forecast-city">
-                    <h3 class="city-name">${city.name}</h3>
-                    <div class="forecast-unavailable">
-                        <p>📈 天气预报功能暂不可用</p>
-                        <p>API权限限制，仅支持实时天气</p>
-                    </div>
-                </div>`;
-            }
-        });
-        weatherHtml += '</div>';
+    // 根据当前视图显示不同内容
+    switch (currentWeatherView) {
+        case 'current':
+            weatherHtml += renderCurrentWeather(weatherIcons);
+            break;
+        case 'forecast':
+            weatherHtml += renderForecastWeather(weatherIcons);
+            break;
+        case 'warning':
+            weatherHtml += renderWarningWeather();
+            break;
+        case 'indices':
+            weatherHtml += renderIndicesWeather();
+            break;
+        case 'air':
+            weatherHtml += renderAirQuality();
+            break;
     }
     
     weatherHtml += '</div></div>';
     weatherContainer.innerHTML = weatherHtml;
+}
+
+// 渲染实时天气
+function renderCurrentWeather(weatherIcons) {
+    let html = '<div class="weather-cities">';
+    
+    WEATHER_CONFIG.cities.forEach(city => {
+        const data = weatherData[city.name];
+        if (data && data.now) {
+            const temp = Math.round(data.now.temp);
+            const feelsLike = data.now.feelsLike ? Math.round(data.now.feelsLike) : temp;
+            const description = data.now.text;
+            const icon = weatherIcons[description] || '🌤️';
+            const humidity = data.now.humidity;
+            const windDir = data.now.windDir;
+            const windScale = data.now.windScale;
+            const pressure = data.now.pressure;
+            const vis = data.now.vis;
+            
+            html += `
+                <div class="weather-city-card">
+                    <h3 class="city-name">${city.name}</h3>
+                    <div class="weather-main">
+                        <div class="weather-icon">${icon}</div>
+                        <div class="temp-section">
+                            <div class="temperature">${temp}°C</div>
+                            <div class="feels-like">体感 ${feelsLike}°C</div>
+                        </div>
+                    </div>
+                    <div class="weather-desc">${description}</div>
+                    <div class="weather-details">
+                        <div class="detail-row">
+                            <span>💧 湿度 ${humidity}%</span>
+                            <span>💨 ${windDir} ${windScale}级</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>📊 气压 ${pressure}hPa</span>
+                            <span>👁️ 能见度 ${vis}km</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+// 渲染预报天气
+function renderForecastWeather(weatherIcons) {
+    let html = '<div class="weather-forecast">';
+    
+    WEATHER_CONFIG.cities.forEach(city => {
+        const data = weatherData[city.name];
+        if (data && (data.forecast7d || data.forecast3d)) {
+            const forecast = data.forecast7d || data.forecast3d;
+            
+            html += `<div class="forecast-city">
+                <h3 class="city-name">${city.name} - ${forecast.length}天预报</h3>
+                <div class="forecast-days">`;
+            
+            forecast.forEach((day, index) => {
+                const date = new Date(day.fxDate);
+                const dayName = index === 0 ? '今天' : (index === 1 ? '明天' : (index === 2 ? '后天' : `${date.getMonth() + 1}/${date.getDate()}`));
+                const icon = weatherIcons[day.textDay] || '🌤️';
+                const uvLevel = day.uvIndex ? `UV ${day.uvIndex}` : '';
+                
+                html += `
+                    <div class="forecast-day">
+                        <div class="day-info">
+                            <span class="day-name">${dayName}</span>
+                            <span class="day-date">${day.fxDate}</span>
+                        </div>
+                        <div class="day-weather">
+                            <div class="day-icon">${icon}</div>
+                            <div class="day-temp">${day.tempMin}° / ${day.tempMax}°</div>
+                            <div class="day-desc">${day.textDay}</div>
+                            ${uvLevel ? `<div class="day-uv">${uvLevel}</div>` : ''}
+                        </div>
+                        <div class="day-details">
+                            <span>💨 ${day.windDirDay} ${day.windScaleDay}</span>
+                            <span>💧 ${day.humidity}%</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div></div>';
+        }
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+// 渲染预警信息
+function renderWarningWeather() {
+    let html = '<div class="weather-warnings">';
+    
+    let hasWarnings = false;
+    WEATHER_CONFIG.cities.forEach(city => {
+        const data = weatherData[city.name];
+        if (data && data.warning && data.warning.length > 0) {
+            hasWarnings = true;
+            html += `<div class="warning-city">
+                <h3 class="city-name">${city.name}</h3>
+                <div class="warning-list">`;
+            
+            data.warning.forEach(warning => {
+                const severityColors = {
+                    'Blue': '#2196F3',
+                    'Yellow': '#FF9800', 
+                    'Orange': '#FF5722',
+                    'Red': '#F44336'
+                };
+                const color = severityColors[warning.severityColor] || '#2196F3';
+                
+                html += `
+                    <div class="warning-item" style="border-left-color: ${color}">
+                        <div class="warning-header">
+                            <span class="warning-type">${warning.typeName}</span>
+                            <span class="warning-level" style="background: ${color}">${warning.severity}</span>
+                        </div>
+                        <div class="warning-title">${warning.title}</div>
+                        <div class="warning-time">发布时间: ${new Date(warning.pubTime).toLocaleString()}</div>
+                        <div class="warning-text">${warning.text}</div>
+                    </div>
+                `;
+            });
+            
+            html += '</div></div>';
+        }
+    });
+    
+    if (!hasWarnings) {
+        html += `
+            <div class="no-warnings">
+                <div class="no-warnings-icon">🌤️</div>
+                <h3>暂无天气预警</h3>
+                <p>当前两地天气状况良好，无需特别关注</p>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
+    return html;
+}
+
+// 渲染生活指数
+function renderIndicesWeather() {
+    let html = '<div class="weather-indices">';
+    
+    WEATHER_CONFIG.cities.forEach(city => {
+        const data = weatherData[city.name];
+        if (data && data.indices && data.indices.length > 0) {
+            html += `<div class="indices-city">
+                <h3 class="city-name">${city.name}</h3>
+                <div class="indices-grid">`;
+            
+            data.indices.forEach(index => {
+                const levelColors = {
+                    '1': '#4CAF50', // 绿色 - 优
+                    '2': '#8BC34A', // 浅绿 - 良好
+                    '3': '#FF9800', // 橙色 - 一般
+                    '4': '#FF5722', // 红色 - 差
+                    '5': '#9C27B0'  // 紫色 - 很差
+                };
+                const color = levelColors[index.level] || '#607D8B';
+                
+                html += `
+                    <div class="index-item">
+                        <div class="index-header">
+                            <span class="index-name">${index.name}</span>
+                            <span class="index-level" style="background: ${color}">${index.category}</span>
+                        </div>
+                        <div class="index-text">${index.text}</div>
+                    </div>
+                `;
+            });
+            
+            html += '</div></div>';
+        }
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+// 渲染空气质量
+function renderAirQuality() {
+    let html = '<div class="weather-air">';
+    
+    WEATHER_CONFIG.cities.forEach(city => {
+        const data = weatherData[city.name];
+        if (data && data.air) {
+            const aqi = data.air.aqi;
+            const category = data.air.category;
+            const primary = data.air.primary;
+            
+            // AQI等级颜色
+            const aqiColors = {
+                '优': '#4CAF50',
+                '良': '#8BC34A', 
+                '轻度污染': '#FF9800',
+                '中度污染': '#FF5722',
+                '重度污染': '#9C27B0',
+                '严重污染': '#795548'
+            };
+            const color = aqiColors[category] || '#607D8B';
+            
+            html += `
+                <div class="air-city-card">
+                    <h3 class="city-name">${city.name}</h3>
+                    <div class="air-main">
+                        <div class="aqi-value" style="color: ${color}">${aqi}</div>
+                        <div class="aqi-info">
+                            <div class="aqi-category" style="background: ${color}">${category}</div>
+                            <div class="aqi-primary">主要污染物: ${primary}</div>
+                        </div>
+                    </div>
+                    <div class="air-suggestion">
+                        <p>💡 ${getAirSuggestion(category)}</p>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+// 获取空气质量建议
+function getAirSuggestion(category) {
+    const suggestions = {
+        '优': '空气质量令人满意，基本无空气污染，可以正常活动。',
+        '良': '空气质量可以接受，少数特别敏感人群应减少户外活动。',
+        '轻度污染': '易感人群症状有轻度加剧，健康人群出现刺激症状。',
+        '中度污染': '进一步加剧易感人群症状，可能对健康人群心脏、呼吸系统有影响。',
+        '重度污染': '心脏病和肺病患者症状显著加剧，运动耐受力降低。',
+        '严重污染': '健康人群运动耐受力降低，有明显强烈症状。'
+    };
+    return suggestions[category] || '建议关注空气质量变化。';
 }
 
 function switchWeatherView(view) {
