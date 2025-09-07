@@ -724,11 +724,14 @@ body {
     display: none;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
     z-index: 2000;
 }
 
-.modal-overlay.active {
+.modal-overlay.show {
     display: flex;
+    opacity: 1;
 }
 
 .modal {
@@ -738,6 +741,13 @@ body {
     max-width: 600px;
     width: 90%;
     max-height: 90vh;
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal.show {
+    transform: scale(1);
+}
     overflow-y: auto;
     display: none;
 }

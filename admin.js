@@ -156,14 +156,20 @@ function loadAllData() {
     
     // 更新统计数据
     updateStats();
+    
+    // 记录今日访问
+    recordTodayVisit();
 }
 
 // 更新统计数据
 function updateStats() {
     document.getElementById('totalQuestions').textContent = currentQuestions.length;
+    
+    // 更新今日访问数
+    const todayVisits = getTodayVisits();
+    updateVisitStats(todayVisits);
     document.getElementById('totalImages').textContent = getStorageItem(ADMIN_STORAGE_KEYS.IMAGES)?.length || 0;
     document.getElementById('totalMessages').textContent = JSON.parse(localStorage.getItem('loveMessages') || '[]').length;
-    document.getElementById('todayVisits').textContent = '0'; // 后续可以实现访问统计
 }
 
 // 加载仪表盘数据
@@ -1146,6 +1152,91 @@ function updateLoginTime() {
 // 侧边栏切换（移动端）
 function toggleSidebar() {
     document.querySelector('.sidebar').classList.toggle('open');
+}
+
+// === 模态框管理功能 ===
+
+// 显示模态框
+function showModal(modalId) {
+    const overlay = document.getElementById('modalOverlay');
+    const modal = document.getElementById(modalId);
+    
+    if (overlay && modal) {
+        // 隐藏所有模态框
+        document.querySelectorAll('.modal').forEach(m => {
+            m.style.display = 'none';
+        });
+        
+        // 显示指定模态框
+        modal.style.display = 'block';
+        overlay.style.display = 'flex';
+        
+        // 添加动画
+        setTimeout(() => {
+            overlay.classList.add('show');
+            modal.classList.add('show');
+        }, 10);
+    }
+}
+
+// 关闭模态框
+function closeModal() {
+    const overlay = document.getElementById('modalOverlay');
+    
+    if (overlay) {
+        overlay.classList.remove('show');
+        
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            document.querySelectorAll('.modal').forEach(m => {
+                m.style.display = 'none';
+                m.classList.remove('show');
+            });
+        }, 300);
+    }
+}
+
+// 显示上传图片模态框
+function showUploadModal() {
+    // 重置表单
+    document.getElementById('imageForm').reset();
+    document.getElementById('fileInput').value = '';
+    document.getElementById('imageDate').value = new Date().toISOString().split('T')[0];
+    showModal('uploadModal');
+}
+
+// === 访问统计功能 ===
+
+// 记录今日访问
+function recordTodayVisit() {
+    const today = new Date().toDateString();
+    const visits = getStorageItem('love_visits') || {};
+    
+    // 初始化今日访问数
+    if (!visits[today]) {
+        visits[today] = 0;
+    }
+    
+    visits[today]++;
+    setStorageItem('love_visits', visits);
+    
+    // 更新显示
+    updateVisitStats(visits[today]);
+}
+
+// 更新访问统计显示
+function updateVisitStats(todayCount) {
+    const todayVisitsEl = document.getElementById('todayVisits');
+    if (todayVisitsEl) {
+        todayVisitsEl.textContent = todayCount;
+    }
+}
+
+// 获取今日访问数
+function getTodayVisits() {
+    const today = new Date().toDateString();
+    const visits = getStorageItem('love_visits') || {};
+    return visits[today] || 0;
 }
 
 // HTML转义函数

@@ -35,6 +35,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化留言输入
     initMessageInput();
+    
+    // 记录访问统计
+    recordVisit();
 });
 
 // 导航系统
@@ -736,7 +739,9 @@ let currentGalleryCategory = 'all';
 // 加载相册数据
 function loadGalleryData() {
     try {
+        // 使用与管理后台完全相同的存储键
         const images = JSON.parse(localStorage.getItem('love_admin_images') || '[]');
+        console.log('加载到的图片数据:', images); // 调试日志
         displayGallery(images, currentGalleryCategory);
     } catch (error) {
         console.error('加载相册数据失败:', error);
@@ -968,7 +973,9 @@ document.head.appendChild(galleryModalStyle);
 // 加载时光轴数据
 function loadTimelineData() {
     try {
+        // 使用与管理后台完全相同的存储键
         const timeline = JSON.parse(localStorage.getItem('love_admin_timeline') || '[]');
+        console.log('加载到的时光轴数据:', timeline); // 调试日志
         displayTimeline(timeline);
     } catch (error) {
         console.error('加载时光轴数据失败:', error);
@@ -1246,4 +1253,26 @@ function escapeHtml(text) {
         "'": '&#039;'
     };
     return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+// === 访问统计功能 ===
+
+// 记录访问
+function recordVisit() {
+    try {
+        const today = new Date().toDateString();
+        const visits = JSON.parse(localStorage.getItem('love_visits') || '{}');
+        
+        // 初始化今日访问数
+        if (!visits[today]) {
+            visits[today] = 0;
+        }
+        
+        visits[today]++;
+        localStorage.setItem('love_visits', JSON.stringify(visits));
+        
+        console.log('今日访问数已记录:', visits[today]);
+    } catch (error) {
+        console.error('记录访问失败:', error);
+    }
 }
