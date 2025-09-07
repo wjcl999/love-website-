@@ -461,6 +461,47 @@
                 <button class="btn btn-primary" onclick="saveImages()">保存图片</button>
             </div>
         </div>
+
+        <!-- 添加时光轴弹窗 -->
+        <div id="addTimelineModal" class="modal">
+            <div class="modal-header">
+                <h3>添加时光轴</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="timelineForm">
+                    <div class="form-group">
+                        <label>时间</label>
+                        <input type="date" id="timelineDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>标题</label>
+                        <input type="text" id="timelineTitle" placeholder="请输入标题..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>描述</label>
+                        <textarea id="timelineDescription" placeholder="描述这个重要时刻..." rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>emoji图标</label>
+                        <select id="timelineIcon">
+                            <option value="💕">💕 初次相遇</option>
+                            <option value="💝">💝 确定关系</option>
+                            <option value="🎂">🎂 生日纪念</option>
+                            <option value="✈️">✈️ 旅行回忆</option>
+                            <option value="🎊">🎊 节日庆祝</option>
+                            <option value="💍">💍 重要承诺</option>
+                            <option value="🌟">🌟 特殊时刻</option>
+                            <option value="❤️">❤️ 甜蜜日常</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveTimeline()">保存</button>
+            </div>
+        </div>
     </div>
 
     <script src="questions.js"></script>

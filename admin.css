@@ -1508,3 +1508,114 @@ body {
         height: 35px;
     }
 }
+
+/* 时光轴管理样式 */
+.timeline-list {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline-admin-item {
+    display: flex;
+    align-items: flex-start;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.timeline-admin-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.timeline-admin-date {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 20px;
+    min-width: 120px;
+}
+
+.date-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.timeline-icon {
+    font-size: 32px;
+    background: rgba(102, 126, 234, 0.1);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline-admin-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.timeline-admin-content h4 {
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.timeline-admin-content p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.timeline-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+}
+
+.empty-state p {
+    margin: 20px 0;
+    font-size: 16px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .timeline-admin-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .timeline-admin-date {
+        margin-right: 0;
+        margin-bottom: 15px;
+        min-width: auto;
+    }
+    
+    .timeline-actions {
+        justify-content: center;
+    }
+}

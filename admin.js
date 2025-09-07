@@ -901,6 +901,119 @@ function updateImageStats(count) {
     document.getElementById('totalImages').textContent = count;
 }
 
+// === 时光轴管理功能 ===
+
+// 加载时光轴数据
+function loadTimelineData() {
+    const timeline = getStorageItem(ADMIN_STORAGE_KEYS.TIMELINE) || [];
+    displayTimeline(timeline);
+}
+
+// 显示时光轴
+function displayTimeline(timeline) {
+    const container = document.getElementById('timelineList');
+    
+    if (timeline.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-clock" style="font-size: 48px; color: #ccc; margin-bottom: 20px;"></i>
+                <p>还没有时光轴记录，点击添加时刻开始记录美好回忆</p>
+                <button class="btn btn-primary" onclick="showAddTimelineModal()">
+                    <i class="fas fa-plus"></i>
+                    添加第一个时刻
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    // 按日期排序（最新的在前）
+    const sortedTimeline = timeline.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    container.innerHTML = sortedTimeline.map(item => `
+        <div class="timeline-admin-item">
+            <div class="timeline-admin-date">
+                <div class="date-badge">${formatDate(item.date)}</div>
+                <div class="timeline-icon">${item.icon}</div>
+            </div>
+            <div class="timeline-admin-content">
+                <h4>${item.title}</h4>
+                <p>${item.description}</p>
+                <div class="timeline-actions">
+                    <button class="btn btn-sm btn-outline" onclick="editTimeline('${item.id}')">
+                        <i class="fas fa-edit"></i>
+                        编辑
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteTimeline('${item.id}')">
+                        <i class="fas fa-trash"></i>
+                        删除
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 格式化日期
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// 显示添加时光轴模态框
+function showAddTimelineModal() {
+    document.getElementById('timelineForm').reset();
+    document.getElementById('timelineDate').value = new Date().toISOString().split('T')[0];
+    showModal('addTimelineModal');
+}
+
+// 保存时光轴
+function saveTimeline() {
+    const date = document.getElementById('timelineDate').value;
+    const title = document.getElementById('timelineTitle').value;
+    const description = document.getElementById('timelineDescription').value;
+    const icon = document.getElementById('timelineIcon').value;
+    
+    if (!date || !title.trim() || !description.trim()) {
+        showNotification('请填写完整信息', 'error');
+        return;
+    }
+    
+    const timeline = getStorageItem(ADMIN_STORAGE_KEYS.TIMELINE) || [];
+    
+    const newItem = {
+        id: 'timeline_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        date: date,
+        title: title.trim(),
+        description: description.trim(),
+        icon: icon,
+        createTime: new Date().toISOString()
+    };
+    
+    timeline.push(newItem);
+    setStorageItem(ADMIN_STORAGE_KEYS.TIMELINE, timeline);
+    
+    // 刷新显示
+    loadTimelineData();
+    closeModal();
+    showNotification('时光轴添加成功！', 'success');
+}
+
+// 删除时光轴
+function deleteTimeline(timelineId) {
+    if (!confirm('确定要删除这个时光轴记录吗？')) return;
+    
+    const timeline = getStorageItem(ADMIN_STORAGE_KEYS.TIMELINE) || [];
+    const filtered = timeline.filter(item => item.id !== timelineId);
+    
+    setStorageItem(ADMIN_STORAGE_KEYS.TIMELINE, filtered);
+    loadTimelineData();
+    showNotification('时光轴删除成功！', 'success');
+}
+
 // 访问主站
 function visitMainSite() {
     window.open('index.html', '_blank');

@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 加载相册数据
     loadGalleryData();
+    
+    // 加载时光轴数据
+    loadTimelineData();
 });
 
 // 导航系统
@@ -953,3 +956,76 @@ galleryModalStyle.textContent = `
     }
 `;
 document.head.appendChild(galleryModalStyle);
+
+// === 时光轴功能 ===
+
+// 加载时光轴数据
+function loadTimelineData() {
+    try {
+        const timeline = JSON.parse(localStorage.getItem('love_admin_timeline') || '[]');
+        displayTimeline(timeline);
+    } catch (error) {
+        console.error('加载时光轴数据失败:', error);
+        displayEmptyTimeline();
+    }
+}
+
+// 显示时光轴
+function displayTimeline(timeline) {
+    const container = document.getElementById('timelineContainer');
+    
+    if (!container) return;
+    
+    if (timeline.length === 0) {
+        displayEmptyTimeline();
+        return;
+    }
+    
+    // 按日期排序（最新的在前）
+    const sortedTimeline = timeline.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    container.innerHTML = sortedTimeline.map((item, index) => `
+        <div class="timeline-item fade-in-up delay-${index % 3}00">
+            <div class="timeline-date">${formatTimelineDate(item.date)}</div>
+            <div class="timeline-content">
+                <h3>${item.icon} ${item.title}</h3>
+                <p>${item.description}</p>
+            </div>
+        </div>
+    `).join('');
+    
+    // 重新触发动画
+    setTimeout(() => {
+        container.querySelectorAll('.timeline-item').forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-30px)';
+            setTimeout(() => {
+                item.style.transition = 'all 0.6s ease';
+                item.style.opacity = '1';
+                item.style.transform = 'translateX(0)';
+            }, index * 150);
+        });
+    }, 100);
+}
+
+// 显示空时光轴
+function displayEmptyTimeline() {
+    const container = document.getElementById('timelineContainer');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="timeline-placeholder">
+            <div class="timeline-placeholder-icon">⏰</div>
+            <p>还没有时光轴记录，快去管理后台添加吧~</p>
+        </div>
+    `;
+}
+
+// 格式化时光轴日期显示
+function formatTimelineDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
