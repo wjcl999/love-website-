@@ -435,6 +435,18 @@ function closeModal() {
     }
 }
 
+// 点击模态框背景关闭
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('photoModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    }
+});
+
 // 时光轴图片放大功能
 function openTimelineImage(imageUrl, caption) {
     const modal = document.getElementById('photoModal');
