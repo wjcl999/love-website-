@@ -139,10 +139,12 @@ const GALLERY_DATA = {
 
 // 天气API配置 - 使用和风天气API（国内访问更稳定）
 const WEATHER_CONFIG = {
-    apiKey: 'your_api_key_here', // 需要替换为和风天气API密钥
-    city: '101020100', // 城市代码，上海为101020100，北京为101010100
-    cityName: '上海', // 城市中文名显示用
-    enabled: false // 如果有API密钥，改为true
+    apiKey: '6a4891b3a5744a9a8d6ee1feb42d55c2',
+    cities: [
+        { code: '101120801', name: '淄博' },
+        { code: '101250101', name: '长沙' }
+    ],
+    enabled: true
 };
 
 // ==================== 主要功能 ====================
@@ -488,60 +490,146 @@ function openTimelineImage(imageUrl, caption) {
 }
 
 // 天气功能
+let weatherData = {};
+let currentWeatherView = 'current'; // current, forecast
+
 function initWeather() {
     if (!WEATHER_CONFIG.enabled || !WEATHER_CONFIG.apiKey) {
         console.log('天气功能未启用，请配置API密钥');
         return;
     }
     
-    fetchWeather();
+    fetchAllWeatherData();
     // 每30分钟更新一次天气
-    setInterval(fetchWeather, 30 * 60 * 1000);
+    setInterval(fetchAllWeatherData, 30 * 60 * 1000);
 }
 
-function fetchWeather() {
+async function fetchAllWeatherData() {
     if (!WEATHER_CONFIG.enabled) return;
     
-    // 和风天气API - 免费版本，每天1000次请求
-    const apiUrl = `https://devapi.qweather.com/v7/weather/now?location=${WEATHER_CONFIG.city}&key=${WEATHER_CONFIG.apiKey}`;
-    
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data.code === '200') {
-                displayWeather(data.now);
-            } else {
-                console.log('天气获取失败:', data.code);
-            }
-        })
-        .catch(error => {
-            console.log('天气获取失败:', error);
-        });
-}
-
-function displayWeather(weatherData) {
-    // 可以在页面添加天气显示区域
     const weatherContainer = document.getElementById('weather-container');
     if (!weatherContainer) return;
     
-    const temp = Math.round(weatherData.temp);
-    const description = weatherData.text;
+    weatherContainer.innerHTML = '<div class="weather-loading">🌤️ 加载天气信息中...</div>';
+    
+    try {
+        for (const city of WEATHER_CONFIG.cities) {
+            // 获取实时天气
+            const nowResponse = await fetch(`https://devapi.qweather.com/v7/weather/now?location=${city.code}&key=${WEATHER_CONFIG.apiKey}`);
+            const nowData = await nowResponse.json();
+            
+            // 获取3天预报
+            const forecastResponse = await fetch(`https://devapi.qweather.com/v7/weather/3d?location=${city.code}&key=${WEATHER_CONFIG.apiKey}`);
+            const forecastData = await forecastResponse.json();
+            
+            if (nowData.code === '200' && forecastData.code === '200') {
+                weatherData[city.name] = {
+                    now: nowData.now,
+                    forecast: forecastData.daily
+                };
+            }
+        }
+        displayWeather();
+    } catch (error) {
+        console.log('天气获取失败:', error);
+        weatherContainer.innerHTML = '<div class="weather-error">😔 天气信息获取失败</div>';
+    }
+}
+
+function displayWeather() {
+    const weatherContainer = document.getElementById('weather-container');
+    if (!weatherContainer) return;
     
     // 天气图标映射
     const weatherIcons = {
         '晴': '☀️', '多云': '⛅', '阴': '☁️', '小雨': '🌦️', '中雨': '🌧️', 
-        '大雨': '⛈️', '雪': '❄️', '雾': '🌫️', '霾': '😷'
+        '大雨': '⛈️', '雪': '❄️', '雾': '🌫️', '霾': '😷', '雷阵雨': '⛈️',
+        '小到中雨': '🌧️', '中到大雨': '⛈️', '大到暴雨': '🌊', '暴雨': '🌊'
     };
-    const icon = weatherIcons[description] || '🌤️';
     
-    weatherContainer.innerHTML = `
-        <div class="weather-info">
-            <div class="weather-icon">${icon}</div>
-            <span class="temperature">${temp}°C</span>
-            <span class="description">${description}</span>
-            <span class="location">${WEATHER_CONFIG.cityName}</span>
-        </div>
+    let weatherHtml = `
+        <div class="weather-widget">
+            <div class="weather-tabs">
+                <button class="weather-tab ${currentWeatherView === 'current' ? 'active' : ''}" onclick="switchWeatherView('current')">实时天气</button>
+                <button class="weather-tab ${currentWeatherView === 'forecast' ? 'active' : ''}" onclick="switchWeatherView('forecast')">三天预报</button>
+            </div>
+            <div class="weather-content">
     `;
+    
+    if (currentWeatherView === 'current') {
+        // 实时天气显示
+        weatherHtml += '<div class="weather-cities">';
+        WEATHER_CONFIG.cities.forEach(city => {
+            const data = weatherData[city.name];
+            if (data && data.now) {
+                const temp = Math.round(data.now.temp);
+                const description = data.now.text;
+                const icon = weatherIcons[description] || '🌤️';
+                const humidity = data.now.humidity;
+                const windDir = data.now.windDir;
+                const windScale = data.now.windScale;
+                
+                weatherHtml += `
+                    <div class="weather-city-card">
+                        <h3 class="city-name">${city.name}</h3>
+                        <div class="weather-main">
+                            <div class="weather-icon">${icon}</div>
+                            <div class="temperature">${temp}°C</div>
+                        </div>
+                        <div class="weather-desc">${description}</div>
+                        <div class="weather-details">
+                            <span>💧 湿度 ${humidity}%</span>
+                            <span>💨 ${windDir}风 ${windScale}级</span>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+        weatherHtml += '</div>';
+    } else {
+        // 预报天气显示
+        weatherHtml += '<div class="weather-forecast">';
+        WEATHER_CONFIG.cities.forEach(city => {
+            const data = weatherData[city.name];
+            if (data && data.forecast) {
+                weatherHtml += `<div class="forecast-city">
+                    <h3 class="city-name">${city.name}</h3>
+                    <div class="forecast-days">`;
+                
+                data.forecast.slice(0, 3).forEach((day, index) => {
+                    const date = new Date(day.fxDate);
+                    const dayName = index === 0 ? '今天' : (index === 1 ? '明天' : '后天');
+                    const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+                    const icon = weatherIcons[day.textDay] || '🌤️';
+                    
+                    weatherHtml += `
+                        <div class="forecast-day">
+                            <div class="day-info">
+                                <span class="day-name">${dayName}</span>
+                                <span class="day-date">${dateStr}</span>
+                            </div>
+                            <div class="day-weather">
+                                <div class="day-icon">${icon}</div>
+                                <div class="day-temp">${day.tempMin}°-${day.tempMax}°</div>
+                                <div class="day-desc">${day.textDay}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                weatherHtml += '</div></div>';
+            }
+        });
+        weatherHtml += '</div>';
+    }
+    
+    weatherHtml += '</div></div>';
+    weatherContainer.innerHTML = weatherHtml;
+}
+
+function switchWeatherView(view) {
+    currentWeatherView = view;
+    displayWeather();
 }
 
 // 交互效果
