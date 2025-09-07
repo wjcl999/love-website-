@@ -828,16 +828,20 @@ function saveImages() {
         return;
     }
     
-    const images = getStorageItem(ADMIN_STORAGE_KEYS.IMAGES) || [];
+    let processedCount = 0;
+    const totalFiles = fileInput.files.length;
     
     // 处理每个选中的文件
     Array.from(fileInput.files).forEach(file => {
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function(e) {
+                // 每次都从localStorage重新读取最新数据
+                const images = getStorageItem(ADMIN_STORAGE_KEYS.IMAGES) || [];
+                
                 const newImage = {
                     id: 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                    url: e.target.result, // 使用base64编码存储图片
+                    url: e.target.result,
                     category: category,
                     description: description,
                     date: date || new Date().toISOString().split('T')[0],
@@ -847,9 +851,14 @@ function saveImages() {
                 images.push(newImage);
                 setStorageItem(ADMIN_STORAGE_KEYS.IMAGES, images);
                 
-                // 刷新显示
-                loadImagesData();
-                showNotification('图片上传成功！', 'success');
+                processedCount++;
+                console.log(`图片 ${processedCount}/${totalFiles} 已保存`, newImage);
+                
+                // 所有文件处理完成后刷新显示
+                if (processedCount === totalFiles) {
+                    loadImagesData();
+                    showNotification(`成功上传 ${totalFiles} 张图片！`, 'success');
+                }
             };
             reader.readAsDataURL(file);
         }

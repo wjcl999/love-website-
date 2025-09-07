@@ -242,62 +242,12 @@ document.getElementById('photoModal').addEventListener('click', function(e) {
 // 留言系统
 function initMessages() {
     // 从localStorage加载消息
-    loadMessages();
+    loadMessagesData();
 }
 
-function addMessage() {
-    const messageText = document.getElementById('messageText');
-    const text = messageText.value.trim();
-    
-    if (!text) {
-        alert('请输入留言内容！');
-        return;
-    }
-    
-    const message = {
-        content: text,
-        time: new Date().toLocaleDateString('zh-CN'),
-        id: Date.now()
-    };
-    
-    // 保存到localStorage
-    let messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
-    messages.unshift(message);
-    localStorage.setItem('loveMessages', JSON.stringify(messages));
-    
-    // 清空输入框
-    messageText.value = '';
-    
-    // 重新加载消息显示
-    loadMessages();
-    
-    // 显示成功提示
-    showNotification('💕 留言发送成功！');
-}
+// 旧的addMessage函数已删除，使用下方统一的新版本
 
-function loadMessages() {
-    const messagesList = document.getElementById('messagesList');
-    const messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
-    
-    // 如果没有消息，显示默认消息
-    if (messages.length === 0) {
-        messagesList.innerHTML = `
-            <div class="message">
-                <div class="message-content">每天和你在一起都是最幸福的时光 💕</div>
-                <div class="message-time">2024-09-01</div>
-            </div>
-        `;
-        return;
-    }
-    
-    // 显示所有消息
-    messagesList.innerHTML = messages.map(message => `
-        <div class="message">
-            <div class="message-content">${escapeHtml(message.content)}</div>
-            <div class="message-time">${message.time}</div>
-        </div>
-    `).join('');
-}
+// 旧的loadMessages函数已删除，使用loadMessagesData
 
 // HTML转义函数
 function escapeHtml(text) {
@@ -514,44 +464,7 @@ function initMouseFollower() {
     animate();
 }
 
-// 增强的消息添加功能
-function addMessage() {
-    const messageText = document.getElementById('messageText');
-    const text = messageText.value.trim();
-    
-    if (!text) {
-        // 添加错误动画
-        messageText.classList.add('error-animation');
-        setTimeout(() => messageText.classList.remove('error-animation'), 600);
-        showNotification('请输入留言内容！', 'error');
-        return;
-    }
-    
-    const message = {
-        content: text,
-        time: new Date().toLocaleDateString('zh-CN'),
-        id: Date.now()
-    };
-    
-    // 保存到localStorage
-    let messages = JSON.parse(localStorage.getItem('loveMessages') || '[]');
-    messages.unshift(message);
-    localStorage.setItem('loveMessages', JSON.stringify(messages));
-    
-    // 清空输入框
-    messageText.value = '';
-    
-    // 重新加载消息显示
-    loadMessages();
-    
-    // 显示成功提示
-    showNotification('💕 留言发送成功！', 'success');
-    
-    // 添加成功动画
-    const submitBtn = messageText.parentNode.querySelector('button');
-    submitBtn.classList.add('success-animation');
-    setTimeout(() => submitBtn.classList.remove('success-animation'), 2000);
-}
+// 旧的重复addMessage函数已删除，使用下方统一版本
 
 // 增强的通知系统
 function showNotification(message, type = 'info') {
