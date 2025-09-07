@@ -10,7 +10,9 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <!-- 第三方CSS保持静态引用 -->
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="animations.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -107,23 +109,6 @@
         </div>
     </div>
 
-    <script>
-        // 动态加载CSS和JS，防止缓存
-        const timestamp = new Date().getTime();
-        
-        // 重新加载CSS文件
-        const cssFiles = ['style.css', 'animations.css'];
-        cssFiles.forEach(file => {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = `${file}?v=${timestamp}`;
-            document.head.appendChild(link);
-        });
-        
-        // 动态加载JS文件
-        const script = document.createElement('script');
-        script.src = `script.js?v=${timestamp}`;
-        document.head.appendChild(script);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

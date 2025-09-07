@@ -872,6 +872,7 @@ body {
     .timeline-image-item {
         width: 32%;
         height: 150px;
+        -webkit-tap-highlight-color: transparent;
     }
     
     .timeline-image-item:nth-child(even) {
@@ -880,6 +881,17 @@ body {
     
     .timeline-image-item:nth-child(odd) {
         left: 0%;
+    }
+    
+    .timeline-image-wrapper {
+        touch-action: manipulation;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    .image-overlay {
+        opacity: 0.7; /* 手机端默认显示一些透明度 */
     }
     
     .image-overlay i {

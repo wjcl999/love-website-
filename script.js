@@ -322,8 +322,8 @@ function loadStaticTimeline() {
             timelineImage.style.animationDelay = (index * 0.2 + 0.1) + 's';
             
             timelineImage.innerHTML = `
-                <div class="timeline-image-wrapper">
-                    <img src="${item.image}" alt="${item.title}" onclick="openTimelineImage('${item.image}', '${item.title}')">
+                <div class="timeline-image-wrapper" onclick="openTimelineImage('${item.image}', '${item.title}')" ontouchstart="">
+                    <img src="${item.image}" alt="${item.title}">
                     <div class="image-overlay">
                         <i class="fas fa-search-plus"></i>
                     </div>
