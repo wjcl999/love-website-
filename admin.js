@@ -16,11 +16,18 @@ let filteredQuestions = [];
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Admin page DOMContentLoaded event fired');
+    
     // 检查管理员权限
     if (!checkAdminAuth()) {
-        window.location.href = 'auth.html';
+        console.log('🔄 Auth failed, redirecting to auth.html in 1 second...');
+        setTimeout(() => {
+            window.location.href = 'auth.html';
+        }, 1000);
         return;
     }
+    
+    console.log('✅ Auth successful, initializing admin panel...');
     
     // 初始化页面
     initAdminPanel();
@@ -33,31 +40,47 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 设置文件上传
     setupFileUpload();
+    
+    console.log('🎉 Admin panel initialization complete');
 });
 
 // 检查管理员认证
 function checkAdminAuth() {
+    console.log('=== Admin Auth Check Started ===');
+    
     // 检查是否有管理员会话token
     const adminSession = getStorageItem('love_admin_session');
     
+    console.log('Raw admin session data:', adminSession);
+    
     if (!adminSession) {
-        console.log('No admin session found');
+        console.log('❌ No admin session found');
         return false;
     }
     
     // 检查会话是否过期
     const now = Math.floor(Date.now() / 1000);
     const sessionTime = adminSession.timestamp;
-    const isValid = (now - sessionTime) < (30 * 60); // 30分钟有效期
+    const timeDiff = now - sessionTime;
+    const isValid = timeDiff < (30 * 60); // 30分钟有效期
+    
+    console.log('⏰ Current timestamp:', now);
+    console.log('⏰ Session timestamp:', sessionTime);
+    console.log('⏰ Time difference:', timeDiff, 'seconds');
+    console.log('⏰ Is session valid:', isValid);
+    console.log('👤 User role:', adminSession.role);
     
     if (!isValid) {
-        console.log('Admin session expired');
+        console.log('❌ Admin session expired');
         removeStorageItem('love_admin_session');
         return false;
     }
     
-    console.log('Admin session valid');
-    return adminSession.role === 'admin';
+    const isAdmin = adminSession.role === 'admin';
+    console.log('✅ Final auth result:', isAdmin);
+    console.log('=== Admin Auth Check Complete ===');
+    
+    return isAdmin;
 }
 
 // 初始化管理面板
