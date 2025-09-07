@@ -80,21 +80,30 @@ const TIMELINE_DATA = [
         title: '第三次见面 🌟',
         description: '又一次的相聚，每次见面都让人激动不已，感觉时间过得好快又好慢...',
         icon: '🌟',
-        image: ''
+        images: [
+            'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/c5b8466fe17452727d71040e12683d71.jpg',
+            'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/2a0c8361a22adef3e0c5b237aa75fa75.jpg'
+        ]
     },
     {
         date: '2025-07-21',
         title: '方特游玩 🎡',
         description: '第一次一起去游乐园！在方特度过了最快乐的一天，一起坐过山车，一起尖叫，一起欢笑...',
         icon: '🎡',
-        image: ''
+        images: [
+            'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/e6b543e267291fd11d77e31743ae58a9.jpg',
+            'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/21482faed34b985059194c504247f033.jpg'
+        ]
     },
     {
         date: '2025-07-22',
         title: '第三次分离 💔',
         description: '每次分离都让人难过，但也让我们更加珍惜每一次的相聚，期待下一次的见面...',
         icon: '💔',
-        image: ''
+        images: [
+            'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/f852dd1b5a847dd3edd43d2f7388b8da.jpg',
+            'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/9ccc8f9a5b040d64db6992f05a1f05c1.jpg'
+        ]
     }
 ];
 
