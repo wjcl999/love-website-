@@ -46,24 +46,32 @@ document.addEventListener('DOMContentLoaded', function() {
 function checkAdminAuth() {
     console.log('=== Admin Auth Check Started ===');
     
-    // 检查是否有管理员会话token
-    const adminSession = getStorageItem('love_admin_session');
-    
-    console.log('Raw admin session data:', adminSession);
-    
-    if (!adminSession) {
-        console.log('❌ No admin session found');
+    // 直接使用localStorage，不依赖包装函数
+    try {
+        const rawSession = localStorage.getItem('love_admin_session');
+        console.log('Raw localStorage data:', rawSession);
+        
+        if (!rawSession) {
+            console.log('❌ No admin session found in localStorage');
+            return false;
+        }
+        
+        const adminSession = JSON.parse(rawSession);
+        console.log('Parsed admin session data:', adminSession);
+        
+        // 对于666后门，简化验证 - 只检查role
+        console.log('👤 User role:', adminSession.role);
+        
+        const isAdmin = adminSession.role === 'admin';
+        console.log('✅ Final auth result:', isAdmin);
+        console.log('=== Admin Auth Check Complete ===');
+        
+        return isAdmin;
+        
+    } catch (error) {
+        console.error('❌ Error checking admin session:', error);
         return false;
     }
-    
-    // 对于666后门，简化验证 - 只检查role，不检查时间
-    console.log('👤 User role:', adminSession.role);
-    
-    const isAdmin = adminSession.role === 'admin';
-    console.log('✅ Final auth result:', isAdmin);
-    console.log('=== Admin Auth Check Complete ===');
-    
-    return isAdmin;
 }
 
 // 初始化管理面板
