@@ -147,13 +147,15 @@ const WEATHER_CONFIG = {
             code: '101120801', 
             name: '淄博',
             lat: 36.81,
-            lon: 118.05
+            lon: 118.05,
+            person: COUPLE_INFO.boy
         },
         { 
             code: '101250101', 
             name: '长沙',
             lat: 28.23,
-            lon: 112.94
+            lon: 112.94,
+            person: COUPLE_INFO.girl
         }
     ],
     enabled: true
@@ -871,7 +873,13 @@ function renderCurrentWeather(weatherIcons) {
             
             html += `
                 <div class="weather-city-card">
-                    <h3 class="city-name">${city.name}</h3>
+                    <div class="weather-city-header">
+                        <div class="person-avatar">${city.person.avatar}</div>
+                        <div class="city-info">
+                            <h3 class="city-name">${city.name}</h3>
+                            <div class="person-name">${city.person.name}所在地</div>
+                        </div>
+                    </div>
                     <div class="weather-main">
                         <div class="weather-icon">${icon}</div>
                         <div class="temp-section">
