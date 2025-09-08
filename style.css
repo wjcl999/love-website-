@@ -1075,9 +1075,9 @@ body {
 
 .romantic-details {
     display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 .romantic-details span {
