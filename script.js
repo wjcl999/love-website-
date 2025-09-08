@@ -9,11 +9,13 @@ const COUPLE_INFO = {
     boy: {
         name: '奕铭',
         avatar: '👨‍💻',
+        avatarImg: 'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/cb709546b7fe02122d3a20803f8ca092.png',
         bio: '温柔体贴的程序员'
     },
     girl: {
         name: '佳怡', 
         avatar: '👩‍🎨',
+        avatarImg: 'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/19a87a70ea9849a1d1ce9e51c8cd4ae9.png',
         bio: '美丽可爱的设计师'
     }
 };
@@ -856,52 +858,95 @@ function displayWeather() {
 
 // 渲染实时天气
 function renderCurrentWeather(weatherIcons) {
-    let html = '<div class="weather-cities">';
+    // 获取两个城市的数据
+    const city1 = WEATHER_CONFIG.cities[0]; // 淄博-奕铭
+    const city2 = WEATHER_CONFIG.cities[1]; // 长沙-佳怡
+    const data1 = weatherData[city1.name];
+    const data2 = weatherData[city2.name];
     
-    WEATHER_CONFIG.cities.forEach(city => {
-        const data = weatherData[city.name];
-        if (data && data.now) {
-            const temp = Math.round(data.now.temp);
-            const feelsLike = data.now.feelsLike ? Math.round(data.now.feelsLike) : temp;
-            const description = data.now.text;
-            const icon = weatherIcons[description] || '🌤️';
-            const humidity = data.now.humidity;
-            const windDir = data.now.windDir;
-            const windScale = data.now.windScale;
-            const pressure = data.now.pressure;
-            const vis = data.now.vis;
-            
-            html += `
-                <div class="weather-city-card">
-                    <div class="weather-city-header">
-                        <div class="person-avatar">${city.person.avatar}</div>
-                        <div class="city-info">
-                            <h3 class="city-name">${city.name}</h3>
-                            <div class="person-name">${city.person.name}所在地</div>
-                        </div>
+    let html = '<div class="romantic-weather-container">';
+    
+    // 左侧 - 奕铭（淄博）
+    if (data1 && data1.now) {
+        const temp = Math.round(data1.now.temp);
+        const feelsLike = data1.now.feelsLike ? Math.round(data1.now.feelsLike) : temp;
+        const description = data1.now.text;
+        const icon = weatherIcons[description] || '🌤️';
+        const humidity = data1.now.humidity;
+        const windDir = data1.now.windDir;
+        const windScale = data1.now.windScale;
+        
+        html += `
+            <div class="romantic-weather-card romantic-weather-left">
+                <div class="romantic-avatar-section">
+                    <div class="romantic-avatar">
+                        <img src="${city1.person.avatarImg}" alt="${city1.person.name}">
                     </div>
-                    <div class="weather-main">
-                        <div class="weather-icon">${icon}</div>
-                        <div class="temp-section">
-                            <div class="temperature">${temp}°C</div>
-                            <div class="feels-like">体感 ${feelsLike}°C</div>
-                        </div>
-                    </div>
-                    <div class="weather-desc">${description}</div>
-                    <div class="weather-details">
-                        <div class="detail-row">
-                            <span>💧 湿度 ${humidity}%</span>
-                            <span>💨 ${windDir} ${windScale}级</span>
-                        </div>
-                        <div class="detail-row">
-                            <span>📊 气压 ${pressure}hPa</span>
-                            <span>👁️ 能见度 ${vis}km</span>
-                        </div>
+                    <div class="romantic-person-info">
+                        <h3 class="romantic-name">${city1.person.name}</h3>
+                        <p class="romantic-location">${city1.name}</p>
                     </div>
                 </div>
-            `;
-        }
-    });
+                <div class="romantic-weather-info">
+                    <div class="romantic-main-weather">
+                        <div class="romantic-temp">${temp}°</div>
+                        <div class="romantic-icon">${icon}</div>
+                    </div>
+                    <div class="romantic-desc">${description}</div>
+                    <div class="romantic-details">
+                        <span>💧 ${humidity}%</span>
+                        <span>💨 ${windDir} ${windScale}级</span>
+                    </div>
+                </div>
+                <div class="romantic-gradient-bg romantic-gradient-left"></div>
+            </div>
+        `;
+    }
+    
+    // 中间爱心连接
+    html += `
+        <div class="romantic-heart-center">
+            <div class="romantic-heart-icon">💕</div>
+            <div class="romantic-heart-text">异地恋的天气</div>
+        </div>
+    `;
+    
+    // 右侧 - 佳怡（长沙）
+    if (data2 && data2.now) {
+        const temp = Math.round(data2.now.temp);
+        const feelsLike = data2.now.feelsLike ? Math.round(data2.now.feelsLike) : temp;
+        const description = data2.now.text;
+        const icon = weatherIcons[description] || '🌤️';
+        const humidity = data2.now.humidity;
+        const windDir = data2.now.windDir;
+        const windScale = data2.now.windScale;
+        
+        html += `
+            <div class="romantic-weather-card romantic-weather-right">
+                <div class="romantic-avatar-section">
+                    <div class="romantic-avatar">
+                        <img src="${city2.person.avatarImg}" alt="${city2.person.name}">
+                    </div>
+                    <div class="romantic-person-info">
+                        <h3 class="romantic-name">${city2.person.name}</h3>
+                        <p class="romantic-location">${city2.name}</p>
+                    </div>
+                </div>
+                <div class="romantic-weather-info">
+                    <div class="romantic-main-weather">
+                        <div class="romantic-temp">${temp}°</div>
+                        <div class="romantic-icon">${icon}</div>
+                    </div>
+                    <div class="romantic-desc">${description}</div>
+                    <div class="romantic-details">
+                        <span>💧 ${humidity}%</span>
+                        <span>💨 ${windDir} ${windScale}级</span>
+                    </div>
+                </div>
+                <div class="romantic-gradient-bg romantic-gradient-right"></div>
+            </div>
+        `;
+    }
     
     html += '</div>';
     return html;
