@@ -845,6 +845,11 @@ function displayWeather() {
     
     weatherHtml += '</div></div>';
     weatherContainer.innerHTML = weatherHtml;
+    
+    // 初始化横向滚动功能
+    setTimeout(() => {
+        initHorizontalScroll();
+    }, 100);
 }
 
 // 渲染实时天气
@@ -1096,6 +1101,174 @@ function switchWeatherView(view) {
     displayWeather();
 }
 
+// 横向滚动功能 - 支持鼠标滚轮和触摸滑动
+function initHorizontalScroll() {
+    // 为所有.forecast-days容器添加横向滚动支持
+    document.querySelectorAll('.forecast-days').forEach(container => {
+        // 鼠标滚轮横向滚动
+        container.addEventListener('wheel', function(e) {
+            // 防止页面垂直滚动
+            e.preventDefault();
+            
+            // 水平滚动
+            const scrollAmount = e.deltaY * 2; // 调整滚动速度
+            this.scrollLeft += scrollAmount;
+            
+            // 平滑滚动效果
+            this.style.scrollBehavior = 'smooth';
+        });
+        
+        // 鼠标进入时显示滚动提示
+        container.addEventListener('mouseenter', function() {
+            if (this.scrollWidth > this.clientWidth) {
+                this.style.cursor = 'grab';
+                
+                // 检测是否为移动端
+                const isMobile = window.innerWidth <= 768;
+                
+                // 添加滚动提示（如果不存在）
+                if (!this.querySelector('.scroll-hint')) {
+                    const hint = document.createElement('div');
+                    hint.className = 'scroll-hint';
+                    hint.innerHTML = isMobile ? '👆 滑动查看更多' : '🖱️ 滚动查看更多';
+                    hint.style.cssText = `
+                        position: absolute;
+                        top: -30px;
+                        right: 10px;
+                        background: rgba(0, 0, 0, 0.8);
+                        color: white;
+                        padding: 5px 10px;
+                        border-radius: 15px;
+                        font-size: 12px;
+                        opacity: 0.8;
+                        pointer-events: none;
+                        animation: fadeIn 0.3s ease;
+                        z-index: 10;
+                    `;
+                    this.appendChild(hint);
+                    
+                    // 3秒后自动消失
+                    setTimeout(() => {
+                        if (hint.parentNode) {
+                            hint.style.animation = 'fadeOut 0.3s ease';
+                            setTimeout(() => {
+                                if (hint.parentNode) hint.remove();
+                            }, 300);
+                        }
+                    }, 3000);
+                }
+                
+                // 添加移动端滑动指示器
+                if (isMobile && !this.querySelector('.mobile-swipe-hint')) {
+                    const swipeHint = document.createElement('div');
+                    swipeHint.className = 'mobile-swipe-hint';
+                    swipeHint.innerHTML = '👉';
+                    this.appendChild(swipeHint);
+                    
+                    // 用户开始滚动后隐藏提示
+                    this.addEventListener('scroll', function hideHint() {
+                        if (swipeHint.parentNode) {
+                            swipeHint.style.animation = 'fadeOut 0.3s ease';
+                            setTimeout(() => {
+                                if (swipeHint.parentNode) swipeHint.remove();
+                            }, 300);
+                        }
+                        this.removeEventListener('scroll', hideHint);
+                    });
+                }
+                
+                // 添加滚动进度指示器
+                if (!this.querySelector('.scroll-indicator')) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'scroll-indicator';
+                    
+                    const itemCount = this.children.length;
+                    const visibleItems = Math.floor(this.clientWidth / 155); // 每个item大约155px宽
+                    const totalDots = Math.max(1, Math.ceil(itemCount / visibleItems));
+                    
+                    for (let i = 0; i < totalDots; i++) {
+                        const dot = document.createElement('div');
+                        dot.className = 'scroll-dot';
+                        if (i === 0) dot.classList.add('active');
+                        indicator.appendChild(dot);
+                    }
+                    
+                    this.appendChild(indicator);
+                    
+                    // 滚动时更新指示器
+                    this.addEventListener('scroll', () => {
+                        const scrollPercent = this.scrollLeft / (this.scrollWidth - this.clientWidth);
+                        const activeDot = Math.round(scrollPercent * (totalDots - 1));
+                        
+                        indicator.querySelectorAll('.scroll-dot').forEach((dot, index) => {
+                            dot.classList.toggle('active', index === activeDot);
+                        });
+                    });
+                }
+            }
+        });
+        
+        // 鼠标离开时恢复默认光标
+        container.addEventListener('mouseleave', function() {
+            this.style.cursor = 'default';
+        });
+        
+        // 添加拖拽滚动支持
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        
+        container.addEventListener('mousedown', function(e) {
+            isDown = true;
+            this.style.cursor = 'grabbing';
+            startX = e.pageX - this.offsetLeft;
+            scrollLeft = this.scrollLeft;
+            this.style.scrollBehavior = 'auto';
+        });
+        
+        container.addEventListener('mouseleave', function() {
+            isDown = false;
+            this.style.cursor = 'default';
+        });
+        
+        container.addEventListener('mouseup', function() {
+            isDown = false;
+            this.style.cursor = 'grab';
+        });
+        
+        container.addEventListener('mousemove', function(e) {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - this.offsetLeft;
+            const walk = (x - startX) * 2;
+            this.scrollLeft = scrollLeft - walk;
+        });
+        
+        // 触摸支持（移动端）
+        let touchStartX = 0;
+        let touchScrollLeft = 0;
+        
+        container.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+            touchScrollLeft = this.scrollLeft;
+            this.style.scrollBehavior = 'auto';
+        });
+        
+        container.addEventListener('touchmove', function(e) {
+            if (!touchStartX) return;
+            
+            const touchX = e.touches[0].clientX;
+            const diff = touchStartX - touchX;
+            this.scrollLeft = touchScrollLeft + diff;
+        });
+        
+        container.addEventListener('touchend', function() {
+            touchStartX = 0;
+            this.style.scrollBehavior = 'smooth';
+        });
+    });
+}
+
 // 交互效果
 function initInteractiveEffects() {
     // 鼠标跟随效果
@@ -1299,6 +1472,64 @@ function addCustomStyles() {
             font-size: 0.9em;
         }
         
+        /* 滚动提示动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 0.8; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 0.8; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        /* 滑动指示器样式 */
+        .scroll-indicator {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .scroll-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .scroll-dot.active {
+            background: rgba(255, 107, 107, 0.8);
+            transform: scale(1.2);
+        }
+        
+        /* 移动端滑动提示 */
+        .mobile-swipe-hint {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            font-size: 16px;
+            animation: pulse 2s infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: translateY(-50%) scale(1); }
+            50% { opacity: 1; transform: translateY(-50%) scale(1.1); }
+        }
+
         /* 天气错误提示样式 */
         .weather-error, .weather-error-detailed {
             background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
