@@ -650,10 +650,10 @@ async function fetchAllWeatherData() {
                 // 天气预警
                 makeWeatherRequest('/v7/warning/now', { location: city.code }),
                 
-                // 生活指数（运动、洗车、穿衣、感冒、紫外线等）
+                // 生活指数（运动、穿衣、感冒、紫外线等，去掉洗车）
                 makeWeatherRequest('/v7/indices/1d', { 
                     location: city.code,
-                    type: '1,2,3,9,5' // 运动、洗车、穿衣、感冒、紫外线
+                    type: '1,3,9,5' // 运动、穿衣、感冒、紫外线
                 }),
                 
                 // 空气质量
@@ -798,7 +798,6 @@ function createMockForecast(days) {
 function createMockIndices() {
     return [
         { type: '1', name: '运动指数', level: '2', category: '较适宜', text: '天气较好，适宜进行各项运动' },
-        { type: '2', name: '洗车指数', level: '1', category: '适宜', text: '天气较好，适合洗车' },
         { type: '3', name: '穿衣指数', level: '3', category: '较冷', text: '建议着厚外套加毛衣等服装' },
         { type: '9', name: '感冒指数', level: '2', category: '较易发', text: '天气转凉，注意预防感冒' },
         { type: '5', name: '紫外线指数', level: '3', category: '中等', text: '外出需要防晒措施' }
@@ -952,46 +951,47 @@ function renderCurrentWeather(weatherIcons) {
     return html;
 }
 
-// 渲染预报天气
+// 渲染预报天气 - 采用浪漫风格
 function renderForecastWeather(weatherIcons) {
-    let html = '<div class="weather-forecast">';
+    let html = '<div class="romantic-forecast-container">';
     
-    WEATHER_CONFIG.cities.forEach(city => {
+    WEATHER_CONFIG.cities.forEach((city, cityIndex) => {
         const data = weatherData[city.name];
         if (data && (data.forecast7d || data.forecast3d)) {
             const forecast = data.forecast7d || data.forecast3d;
+            const isLeft = cityIndex === 0; // 奕铭在左，佳怡在右
             
-            html += `<div class="forecast-city">
-                <h3 class="city-name">${city.name} - ${forecast.length}天预报</h3>
+            html += `<div class="romantic-forecast-card ${isLeft ? 'romantic-forecast-left' : 'romantic-forecast-right'}">
+                <div class="romantic-forecast-header">
+                    <div class="romantic-avatar">
+                        <img src="${city.person.avatarImg}" alt="${city.person.name}">
+                    </div>
+                    <div class="romantic-person-info">
+                        <h3 class="romantic-name">${city.person.name}</h3>
+                        <p class="romantic-location">${city.name} - ${forecast.length}天预报</p>
+                    </div>
+                </div>
                 <div class="forecast-days">`;
             
-            forecast.forEach((day, index) => {
+            forecast.slice(0, 5).forEach((day, index) => { // 只显示前5天，节省空间
                 const date = new Date(day.fxDate);
                 const dayName = index === 0 ? '今天' : (index === 1 ? '明天' : (index === 2 ? '后天' : `${date.getMonth() + 1}/${date.getDate()}`));
                 const icon = weatherIcons[day.textDay] || '🌤️';
-                const uvLevel = day.uvIndex ? `UV ${day.uvIndex}` : '';
                 
                 html += `
                     <div class="forecast-day">
                         <div class="day-info">
                             <span class="day-name">${dayName}</span>
-                            <span class="day-date">${day.fxDate}</span>
+                            <span class="day-date">${day.fxDate.slice(-5)}</span>
                         </div>
-                        <div class="day-weather">
-                            <div class="day-icon">${icon}</div>
-                            <div class="day-temp">${day.tempMin}° / ${day.tempMax}°</div>
-                            <div class="day-desc">${day.textDay}</div>
-                            ${uvLevel ? `<div class="day-uv">${uvLevel}</div>` : ''}
-                        </div>
-                        <div class="day-details">
-                            <span>💨 ${day.windDirDay} ${day.windScaleDay}</span>
-                            <span>💧 ${day.humidity}%</span>
-                        </div>
+                        <div class="day-icon">${icon}</div>
+                        <div class="day-temp">${day.tempMin}° / ${day.tempMax}°</div>
+                        <div class="day-desc">${day.textDay}</div>
                     </div>
                 `;
             });
             
-            html += '</div></div>';
+            html += '</div><div class="romantic-gradient-bg ' + (isLeft ? 'romantic-gradient-left' : 'romantic-gradient-right') + '"></div></div>';
         }
     });
     
@@ -1092,45 +1092,96 @@ function renderIndicesWeather() {
     return html;
 }
 
-// 渲染空气质量
+// 渲染空气质量 - 采用浪漫左右布局
 function renderAirQuality() {
-    let html = '<div class="weather-air">';
+    const city1 = WEATHER_CONFIG.cities[0]; // 淄博-奕铭
+    const city2 = WEATHER_CONFIG.cities[1]; // 长沙-佳怡
+    const data1 = weatherData[city1.name];
+    const data2 = weatherData[city2.name];
     
-    WEATHER_CONFIG.cities.forEach(city => {
-        const data = weatherData[city.name];
-        if (data && data.air) {
-            const aqi = data.air.aqi;
-            const category = data.air.category;
-            const primary = data.air.primary;
-            
-            // AQI等级颜色
-            const aqiColors = {
-                '优': '#4CAF50',
-                '良': '#8BC34A', 
-                '轻度污染': '#FF9800',
-                '中度污染': '#FF5722',
-                '重度污染': '#9C27B0',
-                '严重污染': '#795548'
-            };
-            const color = aqiColors[category] || '#607D8B';
-            
-            html += `
-                <div class="air-city-card">
-                    <h3 class="city-name">${city.name}</h3>
-                    <div class="air-main">
-                        <div class="aqi-value" style="color: ${color}">${aqi}</div>
-                        <div class="aqi-info">
-                            <div class="aqi-category" style="background: ${color}">${category}</div>
-                            <div class="aqi-primary">主要污染物: ${primary}</div>
-                        </div>
+    let html = '<div class="romantic-air-container">';
+    
+    // 左侧 - 奕铭（淄博）空气质量
+    if (data1 && data1.air) {
+        const aqi = data1.air.aqi;
+        const category = data1.air.category;
+        const primary = data1.air.primary;
+        const aqiColors = {
+            '优': '#4CAF50', '良': '#8BC34A', '轻度污染': '#FF9800',
+            '中度污染': '#FF5722', '重度污染': '#9C27B0', '严重污染': '#795548'
+        };
+        const color = aqiColors[category] || '#607D8B';
+        
+        html += `
+            <div class="romantic-air-card romantic-air-left">
+                <div class="romantic-avatar-section">
+                    <div class="romantic-avatar">
+                        <img src="${city1.person.avatarImg}" alt="${city1.person.name}">
                     </div>
-                    <div class="air-suggestion">
+                    <div class="romantic-person-info">
+                        <h3 class="romantic-name">${city1.person.name}</h3>
+                        <p class="romantic-location">${city1.name} 空气质量</p>
+                    </div>
+                </div>
+                <div class="romantic-air-info">
+                    <div class="romantic-aqi-main">
+                        <div class="romantic-aqi-value" style="color: ${color}">${aqi}</div>
+                        <div class="romantic-aqi-category" style="background: ${color}">${category}</div>
+                    </div>
+                    <div class="romantic-air-details">
+                        <p>主要污染物: ${primary}</p>
                         <p>💡 ${getAirSuggestion(category)}</p>
                     </div>
                 </div>
-            `;
-        }
-    });
+                <div class="romantic-gradient-bg romantic-gradient-left"></div>
+            </div>
+        `;
+    }
+    
+    // 中间爱心连接
+    html += `
+        <div class="romantic-heart-center">
+            <div class="romantic-heart-icon">🌬️</div>
+            <div class="romantic-heart-text">呼吸同片天空</div>
+        </div>
+    `;
+    
+    // 右侧 - 佳怡（长沙）空气质量
+    if (data2 && data2.air) {
+        const aqi = data2.air.aqi;
+        const category = data2.air.category;
+        const primary = data2.air.primary;
+        const aqiColors = {
+            '优': '#4CAF50', '良': '#8BC34A', '轻度污染': '#FF9800',
+            '中度污染': '#FF5722', '重度污染': '#9C27B0', '严重污染': '#795548'
+        };
+        const color = aqiColors[category] || '#607D8B';
+        
+        html += `
+            <div class="romantic-air-card romantic-air-right">
+                <div class="romantic-avatar-section">
+                    <div class="romantic-avatar">
+                        <img src="${city2.person.avatarImg}" alt="${city2.person.name}">
+                    </div>
+                    <div class="romantic-person-info">
+                        <h3 class="romantic-name">${city2.person.name}</h3>
+                        <p class="romantic-location">${city2.name} 空气质量</p>
+                    </div>
+                </div>
+                <div class="romantic-air-info">
+                    <div class="romantic-aqi-main">
+                        <div class="romantic-aqi-value" style="color: ${color}">${aqi}</div>
+                        <div class="romantic-aqi-category" style="background: ${color}">${category}</div>
+                    </div>
+                    <div class="romantic-air-details">
+                        <p>主要污染物: ${primary}</p>
+                        <p>💡 ${getAirSuggestion(category)}</p>
+                    </div>
+                </div>
+                <div class="romantic-gradient-bg romantic-gradient-right"></div>
+            </div>
+        `;
+    }
     
     html += '</div>';
     return html;
