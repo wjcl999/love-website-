@@ -137,11 +137,11 @@ const GALLERY_DATA = {
     ]
 };
 
-// 天气API配置 - 使用和风天气API（国内访问更稳定）
+// 天气API配置 - 使用和风天气API
 const WEATHER_CONFIG = {
-    apiKey: '80162660f80c4323b6ccc00c85440068',
-    apiHost: 'devapi.qweather.com', // 免费版API Host
-    credential: 'CNPKEFEQRA', // API凭据
+    apiKey: '80162660f80c4323b6ccc00c85440068', // 你的API Key
+    apiHost: 'kq564u7k8t.re.qweatherapi.com', // 你的专属API Host
+    jwtToken: null, // JWT Token（如果有的话，推荐使用）
     cities: [
         { 
             code: '101120801', 
@@ -516,12 +516,11 @@ function initWeather() {
     setInterval(fetchAllWeatherData, 30 * 60 * 1000);
 }
 
-// API请求助手函数
+// API请求助手函数 - 严格按照和风天气文档格式
 async function makeWeatherRequest(endpoint, params = {}) {
     const url = new URL(`https://${WEATHER_CONFIG.apiHost}${endpoint}`);
     
     // 添加通用参数
-    url.searchParams.append('key', WEATHER_CONFIG.apiKey);
     url.searchParams.append('lang', 'zh');
     url.searchParams.append('unit', 'm'); // 公制单位
     
@@ -530,8 +529,83 @@ async function makeWeatherRequest(endpoint, params = {}) {
         url.searchParams.append(key, params[key]);
     });
     
-    const response = await fetch(url.toString());
-    return response.json();
+    // 准备请求选项
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    };
+    
+    // 根据文档要求选择认证方式
+    if (WEATHER_CONFIG.jwtToken) {
+        // 方式1: JWT Bearer Token认证（文档推荐）
+        // 格式：-H 'Authorization: Bearer your_token'
+        requestOptions.headers['Authorization'] = `Bearer ${WEATHER_CONFIG.jwtToken}`;
+        console.log('使用JWT Bearer Token认证');
+    } else if (WEATHER_CONFIG.apiKey) {
+        // 方式2: API Key Header认证（文档标准方式）
+        // 格式：-H "X-QW-Api-Key: ABCD1234EFGH"
+        requestOptions.headers['X-QW-Api-Key'] = WEATHER_CONFIG.apiKey;
+        console.log('使用API Key Header认证');
+    } else {
+        throw new Error('未配置API认证信息：请设置 jwtToken 或 apiKey');
+    }
+    
+    // 添加压缩支持（文档要求）
+    requestOptions.headers['Accept-Encoding'] = 'gzip';
+    
+    console.log(`🌤️ API请求: ${url.toString()}`);
+    console.log(`🔑 认证方式: ${WEATHER_CONFIG.jwtToken ? 'JWT Bearer' : 'X-QW-Api-Key'}`);
+    
+    try {
+        const response = await fetch(url.toString(), requestOptions);
+        const data = await response.json();
+        
+        // 记录响应状态
+        console.log(`📡 API响应 [${response.status}]:`, data);
+        
+        // 检查业务状态码
+        if (data.code !== '200') {
+            let errorMsg = `API业务错误: ${data.code}`;
+            
+            // 根据和风天气状态码提供具体建议
+            switch(data.code) {
+                case '401':
+                    errorMsg += ' - API Key无效或未配置';
+                    break;
+                case '402':
+                    errorMsg += ' - API Key已过期';
+                    break;
+                case '403':
+                    errorMsg += ' - 无访问权限或超出调用次数';
+                    break;
+                case '404':
+                    errorMsg += ' - 请求的数据不存在';
+                    break;
+                case '429':
+                    errorMsg += ' - 超过调用频次限制';
+                    break;
+                case '500':
+                    errorMsg += ' - 服务器内部错误';
+                    break;
+                default:
+                    errorMsg += ' - 未知错误';
+            }
+            
+            throw new Error(errorMsg);
+        }
+        
+        if (!response.ok) {
+            throw new Error(`HTTP请求失败: ${response.status} - ${response.statusText}`);
+        }
+        
+        return data;
+        
+    } catch (error) {
+        console.error('❌ API请求失败:', error.message);
+        throw error;
+    }
 }
 
 async function fetchAllWeatherData() {
@@ -539,6 +613,18 @@ async function fetchAllWeatherData() {
     
     const weatherContainer = document.getElementById('weather-container');
     if (!weatherContainer) return;
+    
+    // 验证API配置
+    if (!WEATHER_CONFIG.apiKey && !WEATHER_CONFIG.jwtToken) {
+        weatherContainer.innerHTML = `
+            <div class="weather-error">
+                <h3>⚠️ 天气API配置错误</h3>
+                <p>请配置API Key 或 JWT Token</p>
+                <small>请在 WEATHER_CONFIG 中正确配置认证信息</small>
+            </div>
+        `;
+        return;
+    }
     
     weatherContainer.innerHTML = '<div class="weather-loading">🌤️ 正在获取全面天气信息...</div>';
     
@@ -601,6 +687,38 @@ async function fetchAllWeatherData() {
     } catch (error) {
         console.error('天气获取失败:', error);
         
+        // 根据错误类型显示不同的错误信息
+        let errorMessage = '天气数据获取失败';
+        let errorDetails = error.message || '未知错误';
+        
+        if (error.message.includes('403')) {
+            errorMessage = '⚠️ API访问权限问题';
+            errorDetails = `
+                <p><strong>可能的解决方案：</strong></p>
+                <ul>
+                    <li>1. 检查API Host是否正确（免费版：devapi.qweather.com，付费版：api.qweather.com）</li>
+                    <li>2. 验证API Key是否有效且未过期</li>
+                    <li>3. 确认账户是否有足够的调用次数</li>
+                    <li>4. 尝试使用JWT Token认证（在WEATHER_CONFIG.jwtToken中配置）</li>
+                </ul>
+                <p><small>当前配置：${WEATHER_CONFIG.apiHost}</small></p>
+            `;
+        } else if (error.message.includes('401')) {
+            errorMessage = '🔐 API认证失败';
+            errorDetails = 'API Key无效或已过期，请检查配置';
+        } else if (error.message.includes('429')) {
+            errorMessage = '⏰ API调用次数超限';
+            errorDetails = '今日API调用次数已用完，请明天再试或升级账户';
+        }
+        
+        weatherContainer.innerHTML = `
+            <div class="weather-error-detailed">
+                <h3>${errorMessage}</h3>
+                <div class="error-details">${errorDetails}</div>
+                <button onclick="initWeather()" class="retry-btn">🔄 重试</button>
+            </div>
+        `;
+        
         // 显示模拟数据作为后备
         WEATHER_CONFIG.cities.forEach((city, index) => {
             weatherData[city.name] = {
@@ -627,15 +745,19 @@ async function fetchAllWeatherData() {
             };
         });
         
-        displayWeather();
-        
-        // 显示友好提示
+        // 3秒后显示模拟数据
         setTimeout(() => {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'weather-api-notice';
-            errorDiv.innerHTML = '⚠️ 当前使用模拟数据展示，实际部署时需配置API权限';
-            weatherContainer.appendChild(errorDiv);
-        }, 1000);
+            if (weatherContainer.querySelector('.weather-error-detailed')) {
+                const mockNotice = document.createElement('div');
+                mockNotice.className = 'weather-mock-notice';
+                mockNotice.innerHTML = `
+                    <h4>📊 显示模拟数据</h4>
+                    <p>API暂不可用，以下为模拟天气数据展示</p>
+                `;
+                weatherContainer.appendChild(mockNotice);
+                displayWeather();
+            }
+        }, 3000);
     }
 }
 
@@ -1177,6 +1299,69 @@ function addCustomStyles() {
             font-size: 0.9em;
         }
         
+        /* 天气错误提示样式 */
+        .weather-error, .weather-error-detailed {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px 0;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .weather-error h3, .weather-error-detailed h3 {
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+        
+        .error-details {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: left;
+        }
+        
+        .error-details ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .error-details li {
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+        
+        .retry-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .retry-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .weather-mock-notice {
+            background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .weather-mock-notice h4 {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
             .time-unit {
@@ -1189,6 +1374,10 @@ function addCustomStyles() {
             
             .timeline-image {
                 max-width: 250px;
+            }
+            
+            .error-details {
+                font-size: 0.9em;
             }
         }
     `;
