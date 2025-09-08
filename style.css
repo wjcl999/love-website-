@@ -936,66 +936,27 @@ body {
 }
 
 .weather-city-card {
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.9) 0%, 
-        rgba(255, 255, 255, 0.85) 50%, 
-        rgba(255, 255, 255, 0.8) 100%);
-    border-radius: 25px;
-    padding: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px;
     text-align: center;
     min-width: 260px;
-    border: 1px solid rgba(255, 107, 107, 0.3);
-    box-shadow: 
-        0 15px 35px rgba(255, 107, 107, 0.2),
-        0 8px 25px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(20px) saturate(180%);
-    position: relative;
-    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
 }
 
 .weather-city-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 
-        0 25px 50px rgba(255, 107, 107, 0.3),
-        0 15px 35px rgba(0, 0, 0, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 1);
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.95) 0%, 
-        rgba(255, 255, 255, 0.9) 50%, 
-        rgba(255, 255, 255, 0.85) 100%);
-    border-color: rgba(255, 107, 107, 0.5);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.15);
 }
 
-.weather-city-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.1), 
-        transparent);
-    transition: left 0.6s;
-    z-index: 1;
-}
-
-.weather-city-card:hover::before {
-    left: 100%;
-}
 
 .city-name {
-    color: #e91e63;
+    color: #fff;
     margin-bottom: 18px;
     font-size: 24px;
-    font-weight: 700;
-    text-shadow: 0 2px 4px rgba(233, 30, 99, 0.3);
-    letter-spacing: 0.5px;
-    position: relative;
-    z-index: 2;
+    font-weight: 600;
 }
 
 .weather-main {
@@ -1015,58 +976,44 @@ body {
 
 .temperature {
     font-size: 48px;
-    font-weight: 900;
-    color: #333;
-    text-shadow: 
-        0 2px 6px rgba(0, 0, 0, 0.2),
-        0 1px 2px rgba(0, 0, 0, 0.1);
-    letter-spacing: -1px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .feels-like {
     font-size: 14px;
-    color: #888;
+    color: rgba(255, 255, 255, 0.8);
     margin-top: 5px;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 .weather-desc {
-    color: #666;
+    color: rgba(255, 255, 255, 0.9);
     font-size: 18px;
     font-weight: 500;
     margin-bottom: 18px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 2;
 }
 
 .weather-details {
     display: flex;
     justify-content: space-between;
-    color: #555;
-    font-size: 15px;
-    font-weight: 500;
-    position: relative;
-    z-index: 2;
-    gap: 15px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    gap: 10px;
 }
 
 .weather-details span {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.1);
     padding: 6px 12px;
-    border-radius: 15px;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 107, 107, 0.2);
+    border-radius: 12px;
     flex: 1;
     text-align: center;
     transition: all 0.3s ease;
 }
 
 .weather-details span:hover {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
-    border-color: rgba(255, 107, 107, 0.4);
 }
 
 /* 预报天气样式 */
@@ -1123,28 +1070,19 @@ body {
 }
 
 .forecast-day {
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.85) 0%, 
-        rgba(255, 255, 255, 0.75) 100%);
-    border-radius: 15px;
-    padding: 18px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
     text-align: center;
     min-width: 140px;
     max-width: 140px;
     flex-shrink: 0; /* 防止压缩 */
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 107, 107, 0.2);
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.15);
-    backdrop-filter: blur(10px);
 }
 
 .forecast-day:hover {
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 0.95) 0%, 
-        rgba(255, 255, 255, 0.85) 100%);
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(255, 107, 107, 0.25);
-    border-color: rgba(255, 107, 107, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
 }
 
 .day-info {
@@ -1153,17 +1091,15 @@ body {
 
 .day-name {
     display: block;
-    color: #333;
-    font-weight: 700;
+    color: #fff;
+    font-weight: 600;
     font-size: 15px;
     margin-bottom: 3px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .day-date {
-    color: #666;
+    color: rgba(255, 255, 255, 0.8);
     font-size: 12px;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 .day-icon {
@@ -1172,18 +1108,16 @@ body {
 }
 
 .day-temp {
-    color: #e91e63;
-    font-weight: 700;
+    color: #fff;
+    font-weight: bold;
     font-size: 17px;
     margin: 5px 0;
-    text-shadow: 0 1px 2px rgba(233, 30, 99, 0.2);
 }
 
 .day-desc {
-    color: #555;
+    color: rgba(255, 255, 255, 0.8);
     font-size: 13px;
     font-weight: 500;
-    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
 /* 天气占位符和错误样式 */
@@ -1514,14 +1448,6 @@ body {
         min-width: auto;
         padding: 25px 20px;
         margin: 10px;
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.18) 0%, 
-            rgba(255, 255, 255, 0.1) 50%, 
-            rgba(255, 255, 255, 0.15) 100%);
-        box-shadow: 
-            0 10px 25px rgba(255, 107, 107, 0.12),
-            0 6px 15px rgba(0, 0, 0, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.25);
     }
     
     .weather-main {
@@ -1573,12 +1499,6 @@ body {
         min-width: 120px;
         max-width: 120px;
         flex-shrink: 0;
-        background: linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.9) 0%, 
-            rgba(255, 255, 255, 0.8) 100%);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 107, 107, 0.25);
-        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
     }
     
     .day-info {
