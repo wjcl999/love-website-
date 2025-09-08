@@ -1052,41 +1052,94 @@ function renderWarningWeather() {
     return html;
 }
 
-// 渲染生活指数
+// 渲染生活指数 - 采用浪漫左右布局
 function renderIndicesWeather() {
-    let html = '<div class="weather-indices">';
+    const city1 = WEATHER_CONFIG.cities[0]; // 淄博-奕铭
+    const city2 = WEATHER_CONFIG.cities[1]; // 长沙-佳怡
+    const data1 = weatherData[city1.name];
+    const data2 = weatherData[city2.name];
     
-    WEATHER_CONFIG.cities.forEach(city => {
-        const data = weatherData[city.name];
-        if (data && data.indices && data.indices.length > 0) {
-            html += `<div class="indices-city">
-                <h3 class="city-name">${city.name}</h3>
-                <div class="indices-grid">`;
-            
-            data.indices.forEach(index => {
-                const levelColors = {
-                    '1': '#4CAF50', // 绿色 - 优
-                    '2': '#8BC34A', // 浅绿 - 良好
-                    '3': '#FF9800', // 橙色 - 一般
-                    '4': '#FF5722', // 红色 - 差
-                    '5': '#9C27B0'  // 紫色 - 很差
-                };
-                const color = levelColors[index.level] || '#607D8B';
-                
-                html += `
-                    <div class="index-item">
-                        <div class="index-header">
-                            <span class="index-name">${index.name}</span>
-                            <span class="index-level" style="background: ${color}">${index.category}</span>
-                        </div>
-                        <div class="index-text">${index.text}</div>
+    let html = '<div class="romantic-indices-container">';
+    
+    // 左侧 - 奕铭（淄博）生活指数
+    if (data1 && data1.indices && data1.indices.length > 0) {
+        html += `
+            <div class="romantic-indices-card romantic-indices-left">
+                <div class="romantic-avatar-section">
+                    <div class="romantic-avatar">
+                        <img src="${city1.person.avatarImg}" alt="${city1.person.name}">
                     </div>
-                `;
-            });
+                    <div class="romantic-person-info">
+                        <h3 class="romantic-name">${city1.person.name}</h3>
+                        <p class="romantic-location">${city1.name} 生活指数</p>
+                    </div>
+                </div>
+                <div class="romantic-indices-grid">`;
+        
+        data1.indices.forEach(index => {
+            const levelColors = {
+                '1': '#4CAF50', '2': '#8BC34A', '3': '#FF9800',
+                '4': '#FF5722', '5': '#9C27B0'
+            };
+            const color = levelColors[index.level] || '#607D8B';
             
-            html += '</div></div>';
-        }
-    });
+            html += `
+                <div class="romantic-index-item">
+                    <div class="romantic-index-header">
+                        <span class="romantic-index-name">${index.name}</span>
+                        <span class="romantic-index-level" style="background: ${color}">${index.category}</span>
+                    </div>
+                    <div class="romantic-index-text">${index.text}</div>
+                </div>
+            `;
+        });
+        
+        html += '</div><div class="romantic-gradient-bg romantic-gradient-left"></div></div>';
+    }
+    
+    // 中间爱心连接
+    html += `
+        <div class="romantic-heart-center">
+            <div class="romantic-heart-icon">📊</div>
+            <div class="romantic-heart-text">共同关注</div>
+        </div>
+    `;
+    
+    // 右侧 - 佳怡（长沙）生活指数
+    if (data2 && data2.indices && data2.indices.length > 0) {
+        html += `
+            <div class="romantic-indices-card romantic-indices-right">
+                <div class="romantic-avatar-section">
+                    <div class="romantic-avatar">
+                        <img src="${city2.person.avatarImg}" alt="${city2.person.name}">
+                    </div>
+                    <div class="romantic-person-info">
+                        <h3 class="romantic-name">${city2.person.name}</h3>
+                        <p class="romantic-location">${city2.name} 生活指数</p>
+                    </div>
+                </div>
+                <div class="romantic-indices-grid">`;
+        
+        data2.indices.forEach(index => {
+            const levelColors = {
+                '1': '#4CAF50', '2': '#8BC34A', '3': '#FF9800',
+                '4': '#FF5722', '5': '#9C27B0'
+            };
+            const color = levelColors[index.level] || '#607D8B';
+            
+            html += `
+                <div class="romantic-index-item">
+                    <div class="romantic-index-header">
+                        <span class="romantic-index-name">${index.name}</span>
+                        <span class="romantic-index-level" style="background: ${color}">${index.category}</span>
+                    </div>
+                    <div class="romantic-index-text">${index.text}</div>
+                </div>
+            `;
+        });
+        
+        html += '</div><div class="romantic-gradient-bg romantic-gradient-right"></div></div>';
+    }
     
     html += '</div>';
     return html;
