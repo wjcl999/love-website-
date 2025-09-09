@@ -20,6 +20,55 @@ const COUPLE_INFO = {
     }
 };
 
+// 重要纪念日配置
+const ANNIVERSARIES = [
+    {
+        id: 'love_anniversary',
+        title: '恋爱纪念日',
+        icon: '💕',
+        type: 'yearly', // 每年重复
+        month: 1, // 阳历1月
+        day: 26,
+        description: '我们在一起的纪念日'
+    },
+    {
+        id: 'valentines_day',
+        title: '情人节',
+        icon: '💖',
+        type: 'yearly',
+        month: 2, // 阳历2月
+        day: 14,
+        description: '西方情人节'
+    },
+    {
+        id: 'qixi_festival',
+        title: '七夕节',
+        icon: '💫',
+        type: 'lunar', // 农历
+        month: 7, // 农历七月
+        day: 7,
+        description: '中国传统情人节'
+    },
+    {
+        id: 'yiming_birthday',
+        title: '奕铭生日',
+        icon: '🎂',
+        type: 'lunar', // 农历
+        month: 12, // 农历腊月
+        day: 1, // 农历初一
+        description: '奕铭的生日（农历腊月初一）'
+    },
+    {
+        id: 'jiayi_birthday',
+        title: '佳怡生日',
+        icon: '🎁',
+        type: 'lunar', // 农历
+        month: 7, // 农历七月
+        day: 24, // 农历二十四
+        description: '佳怡的生日（农历七月二十四）'
+    }
+];
+
 // 重要时刻数据 - 奕铭 & 佳怡 的美好回忆
 const TIMELINE_DATA = [
     {
@@ -181,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadStaticTimeline();
     loadStaticGallery();
     initWeather();
+    initAnniversaries(); // 初始化纪念日功能
     
     console.log('✨ 网站加载完成！');
 });
@@ -1777,5 +1827,179 @@ function addCustomStyles() {
 document.addEventListener('DOMContentLoaded', function() {
     addCustomStyles();
 });
+
+// ==================== 农历转换功能 ====================
+// 简化的农历转换（基于近年的农历数据）
+const LUNAR_CALENDAR_DATA = {
+    2024: {
+        1: [11, 1], // 农历正月初一对应阳历2024年2月10日  
+        7: [14, 8], // 农历七月初一对应阳历8月6日，七夕是8月10日，七月二十四是8月29日
+        12: [31, 12] // 农历腊月初一对应阳历12月31日
+    },
+    2025: {
+        1: [29, 1], // 农历正月初一对应阳历2025年1月29日
+        7: [3, 8], // 农历七月初一对应阳历8月3日，七夕是8月29日，七月二十四是8月26日
+        12: [20, 12] // 农历腊月初一对应阳历12月20日
+    },
+    2026: {
+        1: [17, 2], // 农历正月初一对应阳历2026年2月17日
+        7: [22, 8], // 农历七月初一对应阳历8月22日
+        12: [9, 1] // 农历腊月初一对应阳历2027年1月9日
+    }
+};
+
+// 将农历日期转换为阳历日期
+function lunarToSolar(year, lunarMonth, lunarDay) {
+    try {
+        if (!LUNAR_CALENDAR_DATA[year] || !LUNAR_CALENDAR_DATA[year][lunarMonth]) {
+            return null;
+        }
+        
+        const [solarDay, solarMonth] = LUNAR_CALENDAR_DATA[year][lunarMonth];
+        const adjustedDay = solarDay + lunarDay - 1;
+        
+        // 处理月份边界
+        if (lunarMonth === 12 && adjustedDay > 31) {
+            return new Date(year + 1, 0, adjustedDay - 31);
+        } else if (adjustedDay > 31) {
+            return new Date(year, solarMonth, adjustedDay - 31);
+        } else if (adjustedDay <= 0) {
+            return new Date(year, solarMonth - 2, 31 + adjustedDay);
+        }
+        
+        return new Date(year, solarMonth - 1, adjustedDay);
+    } catch (error) {
+        console.error('农历转换错误:', error);
+        return null;
+    }
+}
+
+// ==================== 纪念日计算功能 ====================
+// 计算下一个纪念日日期
+function getNextAnniversaryDate(anniversary, currentYear = new Date().getFullYear()) {
+    const currentDate = new Date();
+    let targetDate;
+    
+    if (anniversary.type === 'yearly') {
+        // 阳历纪念日
+        targetDate = new Date(currentYear, anniversary.month - 1, anniversary.day);
+        
+        // 如果今年的日期已过，计算明年的
+        if (targetDate <= currentDate) {
+            targetDate = new Date(currentYear + 1, anniversary.month - 1, anniversary.day);
+        }
+    } else if (anniversary.type === 'lunar') {
+        // 农历纪念日
+        targetDate = lunarToSolar(currentYear, anniversary.month, anniversary.day);
+        
+        if (!targetDate || targetDate <= currentDate) {
+            // 尝试下一年
+            targetDate = lunarToSolar(currentYear + 1, anniversary.month, anniversary.day);
+        }
+        
+        // 如果还是获取不到，使用预估日期
+        if (!targetDate) {
+            const estimatedMonth = anniversary.month === 12 ? 0 : anniversary.month - 1;
+            const estimatedDay = anniversary.day + 10; // 简单的估算
+            targetDate = new Date(currentYear + (anniversary.month === 12 ? 1 : 0), estimatedMonth, estimatedDay);
+        }
+    }
+    
+    return targetDate;
+}
+
+// 计算距离纪念日的剩余时间
+function calculateTimeUntilAnniversary(anniversaryDate) {
+    const now = new Date();
+    const timeDiff = anniversaryDate.getTime() - now.getTime();
+    
+    if (timeDiff <= 0) return { days: 0, hours: 0, minutes: 0, isToday: true };
+    
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return { days, hours, minutes, isToday: days === 0 };
+}
+
+// 生成纪念日卡片HTML
+function createAnniversaryCard(anniversary, timeLeft, anniversaryDate) {
+    const isUrgent = timeLeft.days <= 3;
+    const urgentClass = isUrgent ? 'countdown-urgent' : '';
+    
+    let countdownText;
+    if (timeLeft.isToday) {
+        countdownText = '🎉 今天就是！';
+    } else if (timeLeft.days === 0) {
+        countdownText = `还有 ${timeLeft.hours} 小时 ${timeLeft.minutes} 分钟`;
+    } else {
+        countdownText = `还有 ${timeLeft.days} 天`;
+        if (timeLeft.days <= 7) {
+            countdownText += ` ${timeLeft.hours} 小时`;
+        }
+    }
+    
+    const dateStr = anniversaryDate.toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    return `
+        <div class="anniversary-card ${urgentClass}">
+            <div class="anniversary-icon">${anniversary.icon}</div>
+            <div class="anniversary-title">${anniversary.title}</div>
+            <div class="anniversary-countdown">${countdownText}</div>
+            <div class="anniversary-date">${dateStr}</div>
+        </div>
+    `;
+}
+
+// 更新纪念日显示
+function updateAnniversaries() {
+    const container = document.getElementById('anniversaryCards');
+    if (!container) return;
+    
+    const currentYear = new Date().getFullYear();
+    const upcomingAnniversaries = [];
+    
+    // 计算所有纪念日并排序
+    ANNIVERSARIES.forEach(anniversary => {
+        const nextDate = getNextAnniversaryDate(anniversary, currentYear);
+        if (nextDate) {
+            const timeLeft = calculateTimeUntilAnniversary(nextDate);
+            upcomingAnniversaries.push({
+                ...anniversary,
+                nextDate,
+                timeLeft,
+                sortKey: nextDate.getTime()
+            });
+        }
+    });
+    
+    // 按时间排序，只显示最近的3个
+    upcomingAnniversaries.sort((a, b) => a.sortKey - b.sortKey);
+    const nearestThree = upcomingAnniversaries.slice(0, 3);
+    
+    // 生成HTML
+    const cardsHTML = nearestThree.map(item => 
+        createAnniversaryCard(item, item.timeLeft, item.nextDate)
+    ).join('');
+    
+    container.innerHTML = cardsHTML || `
+        <div class="anniversary-card">
+            <div class="anniversary-icon">📅</div>
+            <div class="anniversary-title">暂无纪念日</div>
+            <div class="anniversary-countdown">期待下一个特殊的日子</div>
+        </div>
+    `;
+}
+
+// 初始化纪念日功能
+function initAnniversaries() {
+    updateAnniversaries();
+    // 每分钟更新一次倒计时
+    setInterval(updateAnniversaries, 60000);
+}
 
 console.log('💕 静态爱情网站脚本加载完成 - 奕铭 & 佳怡');
