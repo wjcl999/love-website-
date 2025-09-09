@@ -150,14 +150,14 @@ const WEATHER_CONFIG = {
             name: '淄博',
             lat: 36.81,
             lon: 118.05,
-            person: COUPLE_INFO.boy
+            person: COUPLE_INFO.girl
         },
         { 
             code: '101250101', 
             name: '长沙',
             lat: 28.23,
             lon: 112.94,
-            person: COUPLE_INFO.girl
+            person: COUPLE_INFO.boy
         }
     ],
     enabled: true
