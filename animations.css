@@ -409,22 +409,7 @@
     display: inline-block;
 }
 
-/* 彩虹渐变文字 */
-@keyframes rainbowText {
-    0% { color: #ff6b6b; }
-    16% { color: #ff8e53; }
-    32% { color: #ff6b9d; }
-    48% { color: #c44569; }
-    64% { color: #786fa6; }
-    80% { color: #f8b500; }
-    100% { color: #ff6b6b; }
-}
-
-.rainbow-text {
-    animation: rainbowText 3s ease-in-out infinite;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-}
+/* 移除了彩虹文字动画，改用更优雅的渐变效果 */
 
 /* 响应式动画优化 */
 @media (max-width: 768px) {
