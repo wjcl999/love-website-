@@ -956,7 +956,7 @@ function renderCurrentWeather(weatherIcons) {
     html += `
         <div class="romantic-heart-center">
             <div class="romantic-heart-icon">💕</div>
-            <div class="romantic-heart-text"><span class="weather-title-vertical">T<br>A</span>的天气</div>
+            <div class="romantic-heart-text">T<br>A<br>的<br>天<br>气</div>
         </div>
     `;
     
