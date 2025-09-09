@@ -25,7 +25,7 @@ const ANNIVERSARIES = [
     {
         id: 'love_anniversary',
         title: '恋爱纪念日',
-        icon: '💕',
+        icon: 'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/7e0654148bef1c19bca38a7e248d2c38.jpg',
         type: 'yearly', // 每年重复
         month: 1, // 阳历1月
         day: 26,
@@ -34,7 +34,7 @@ const ANNIVERSARIES = [
     {
         id: 'valentines_day',
         title: '情人节',
-        icon: '💖',
+        icon: 'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/ccf3d5389febe9c31962c52106283ea9.jpg',
         type: 'yearly',
         month: 2, // 阳历2月
         day: 14,
@@ -43,7 +43,7 @@ const ANNIVERSARIES = [
     {
         id: 'qixi_festival',
         title: '七夕节',
-        icon: '💫',
+        icon: 'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/ccf3d5389febe9c31962c52106283ea9.jpg',
         type: 'lunar', // 农历
         month: 7, // 农历七月
         day: 7,
@@ -52,7 +52,7 @@ const ANNIVERSARIES = [
     {
         id: 'yiming_birthday',
         title: '奕铭生日',
-        icon: '🎂',
+        icon: 'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/eb8c6edb09dc29822ad1365691fd9a7d.jpg',
         type: 'lunar', // 农历
         month: 12, // 农历腊月
         day: 1, // 农历初一
@@ -61,7 +61,7 @@ const ANNIVERSARIES = [
     {
         id: 'jiayi_birthday',
         title: '佳怡生日',
-        icon: '🎁',
+        icon: 'https://pub-ee1eeac9d405439ea590ac7759f3f7d5.r2.dev/2025/09/36815467333f2bffd5b15c6acaacb755.jpg',
         type: 'lunar', // 农历
         month: 7, // 农历七月
         day: 24, // 农历二十四
@@ -1940,9 +1940,15 @@ function createAnniversaryCard(anniversary, timeLeft, anniversaryDate) {
         day: 'numeric'
     });
     
+    // 判断图标是图片URL还是emoji
+    const isImageIcon = anniversary.icon.startsWith('http');
+    const iconHtml = isImageIcon 
+        ? `<img src="${anniversary.icon}" alt="${anniversary.title}" class="anniversary-icon-img">`
+        : `<div class="anniversary-icon">${anniversary.icon}</div>`;
+    
     return `
         <div class="anniversary-card ${urgentClass}">
-            <div class="anniversary-icon">${anniversary.icon}</div>
+            ${iconHtml}
             <div class="anniversary-title">${anniversary.title}</div>
             <div class="anniversary-countdown">${countdownText}</div>
             <div class="anniversary-date">${dateStr}</div>

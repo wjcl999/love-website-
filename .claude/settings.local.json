@@ -9,7 +9,12 @@
       "Bash(git branch:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "WebFetch(domain:dev.qweather.com)"
+      "WebFetch(domain:dev.qweather.com)",
+      "Bash(node:*)",
+      "WebSearch",
+      "WebFetch(domain:www.sojson.com)",
+      "WebFetch(domain:api.yinwu.info)",
+      "WebFetch(domain:www.huangli123.net)"
     ],
     "deny": [],
     "ask": []
