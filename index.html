@@ -49,11 +49,45 @@
                     <i class="fas fa-moon"></i>
                     <span>解梦</span>
                 </a>
+                <a href="#footprint" data-target="footprint-section">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>足迹</span>
+                </a>
             </div>
         </nav>
 
         <!-- 首页部分 -->
         <section id="home-section" class="section active">
+            <!-- 生日界面移动端强制样式 -->
+            <style>
+                @media (max-width: 768px) {
+                    .birthday-celebration {
+                        padding: 6rem 0.8rem 1rem 0.8rem !important;
+                        margin-top: 80px !important;
+                    }
+                    
+                    .birthday-title {
+                        font-size: 2rem !important;
+                        margin-bottom: 1.2rem !important;
+                        margin-top: 4rem !important;
+                        line-height: 1.3 !important;
+                        padding: 0 10px !important;
+                    }
+                }
+                
+                @media (max-width: 375px) {
+                    .birthday-celebration {
+                        padding: 5rem 0.5rem 0.8rem 0.5rem !important;
+                        margin-top: 70px !important;
+                    }
+                    
+                    .birthday-title {
+                        font-size: 1.7rem !important;
+                        padding: 0 5px !important;
+                        margin-top: 3rem !important;
+                    }
+                }
+            </style>
             <div class="hero">
                 <h1 class="love-title fade-in-up">💕 奕铭 & 佳怡</h1>
                 <div class="couple-info fade-in-up delay-200">
@@ -79,7 +113,19 @@
                 <!-- 纪念日倒计时区域 -->
                 <div class="anniversary-section fade-in-up delay-600">
                     <h2>💖 即将到来的纪念日</h2>
-                    <div class="anniversary-cards" id="anniversaryCards">
+                    <div class="anniversary-cards" id="anniversaryCards" style="margin-top: 80px !important; padding-top: 40px !important;">
+                        <!-- 纪念日卡片间距优化 -->
+                        <style>
+                            @media (max-width: 768px) {
+                                .anniversary-card {
+                                    margin-bottom: 15px !important;
+                                }
+                                
+                                .anniversary-cards {
+                                    gap: 15px !important;
+                                }
+                            }
+                        </style>
                         <!-- 纪念日卡片将通过JavaScript动态生成 -->
                     </div>
                 </div>
@@ -301,38 +347,17 @@
         <!-- 天气信息部分 -->
         <section id="weather-section" class="section">
             <h2>💕 彼此的天气</h2>
-            <div class="weather-container" id="weather-container">
+            <div class="weather-container" id="weather-container" style="margin-top: 50px;">
                 <div class="weather-placeholder">
                     <div class="weather-placeholder-icon">🌤️</div>
                     <p>天气信息加载中，请稍候...</p>
                 </div>
             </div>
         </section>
-    </div>
 
-    <!-- 照片/视频模态框 -->
-    <div id="photoModal" class="modal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <div class="modal-content">
-            <div class="modal-nav">
-                <button class="nav-btn prev-btn" onclick="showPrevMedia()" id="prevBtn">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="nav-btn next-btn" onclick="showNextMedia()" id="nextBtn">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-            <div id="modalPhoto" class="modal-photo">📷</div>
-            <div class="modal-info">
-                <div id="modalCaption" class="modal-caption">照片描述</div>
-                <div id="modalDate" class="modal-date">日期</div>
-                <div id="mediaCounter" class="media-counter">1 / 1</div>
-            </div>
-        </div>
-    </div>
-
+    <!-- 周公解梦、足迹等部分被错误地放在了container外面，现在移入 -->
     <!-- 周公解梦部分 -->
-    <section id="dream-section" class="section" style="padding-top: 10px !important; margin-top: -800px !important; min-height: auto !important; position: relative !important; z-index: 999 !important;">
+    <section id="dream-section" class="section">
         <h2 style="margin-bottom: 20px !important; margin-top: 0 !important;">🌙 周公解梦</h2>
         
         <!-- 搜索框 -->
@@ -375,7 +400,7 @@
         <style>
             /* 解梦页面特殊padding调整 */
             #dream-section {
-                padding-top: 80px !important;
+                padding-top: 200px !important;
                 margin-top: 0 !important;
                 min-height: auto !important;
             }
@@ -385,23 +410,16 @@
                 margin-top: 0 !important;
             }
             
-            /* 桌面端调整 */
-            @media (min-width: 769px) {
-                #dream-section {
-                    padding-top: 80px !important;
-                }
-            }
-            
             /* 移动端调整 */
             @media (max-width: 768px) {
                 #dream-section {
-                    padding-top: 90px !important;
+                    padding-top: 150px !important;
                 }
             }
             
             @media (max-width: 480px) {
                 #dream-section {
-                    padding-top: 85px !important;
+                    padding-top: 140px !important;
                 }
             }
             
@@ -617,41 +635,346 @@
                 display: block !important;
             }
             
-            /* 响应式优化 */
+            /* 手机端深度优化 */
             @media (max-width: 768px) {
+                #dream-section {
+                    padding-top: 150px !important;
+                    margin-top: 0 !important;
+                }
+                
+                #dream-section h2 {
+                    font-size: 1.6rem !important;
+                    margin-bottom: 15px !important;
+                    padding: 0 10px !important;
+                }
+                
+                #dream-section .dream-search-container {
+                    margin: 10px 10px 20px 10px !important;
+                }
+                
                 #dream-section .dream-search-box {
                     flex-direction: column !important;
-                    gap: 15px !important;
-                    padding: 15px !important;
+                    gap: 12px !important;
+                    padding: 12px !important;
+                    border-radius: 18px !important;
                 }
                 
-                #dream-section .dream-keywords {
-                    gap: 8px !important;
-                    padding: 0 15px !important;
+                #dream-section #dreamKeyword {
+                    padding: 14px 18px !important;
+                    font-size: 14px !important;
+                    border-radius: 12px !important;
                 }
                 
-                #dream-section .dream-keyword {
-                    padding: 6px 12px !important;
-                    font-size: 0.9em !important;
+                #dream-section .dream-search-btn {
+                    padding: 14px 18px !important;
+                    font-size: 14px !important;
+                    border-radius: 12px !important;
+                    width: 100% !important;
+                    min-width: auto !important;
+                }
+                
+                #dream-section .dream-tip {
+                    font-size: 11px !important;
+                    padding: 0 5px !important;
+                }
+                
+                #dream-section .dream-results {
+                    margin: 15px 10px !important;
+                }
+                
+                #dream-section .dream-placeholder,
+                #dream-section .dream-loading,
+                #dream-section .dream-error {
+                    padding: 25px 12px !important;
+                    border-radius: 12px !important;
+                }
+                
+                #dream-section .dream-placeholder h3 {
+                    font-size: 1.2rem !important;
+                    margin-bottom: 6px !important;
+                }
+                
+                #dream-section .dream-placeholder p {
+                    font-size: 12px !important;
+                    line-height: 1.4 !important;
                 }
                 
                 #dream-section .dream-card {
-                    padding: 20px !important;
-                    margin: 0 15px 20px 15px !important;
+                    padding: 16px !important;
+                    margin: 0 0 12px 0 !important;
+                    border-radius: 12px !important;
                 }
                 
                 #dream-section .dream-card-title {
-                    font-size: 1.2em !important;
+                    font-size: 1rem !important;
                     flex-direction: column !important;
                     align-items: flex-start !important;
-                    gap: 8px !important;
+                    gap: 6px !important;
+                    margin-bottom: 10px !important;
+                }
+                
+                #dream-section .dream-card-type {
+                    font-size: 10px !important;
+                    padding: 2px 8px !important;
+                    border-radius: 10px !important;
+                }
+                
+                #dream-section .dream-card-content {
+                    font-size: 12px !important;
+                    line-height: 1.5 !important;
+                }
+                
+                #dream-section .dream-hot-keywords {
+                    margin: 25px 10px !important;
+                }
+                
+                #dream-section .dream-hot-keywords h3 {
+                    font-size: 1.1rem !important;
+                    margin-bottom: 12px !important;
+                }
+                
+                #dream-section .dream-keywords {
+                    gap: 6px !important;
+                    padding: 0 2px !important;
+                }
+                
+                #dream-section .dream-keyword {
+                    padding: 6px 10px !important;
+                    font-size: 11px !important;
+                    border-radius: 12px !important;
+                    min-width: auto !important;
+                    flex: 0 0 auto !important;
+                }
+            }
+            
+            /* 超小屏幕优化 */
+            @media (max-width: 375px) {
+                #dream-section {
+                    margin-top: 0 !important;
+                    padding-top: 140px !important;
+                }
+                
+                #dream-section h2 {
+                    font-size: 1.4rem !important;
+                    padding: 0 8px !important;
+                }
+                
+                #dream-section .dream-search-box {
+                    padding: 10px !important;
+                }
+                
+                #dream-section #dreamKeyword {
+                    padding: 12px 15px !important;
+                    font-size: 13px !important;
+                }
+                
+                #dream-section .dream-search-btn {
+                    padding: 12px 15px !important;
+                    font-size: 13px !important;
+                }
+                
+                #dream-section .dream-card {
+                    padding: 14px !important;
+                }
+                
+                #dream-section .dream-keyword {
+                    padding: 5px 8px !important;
+                    font-size: 10px !important;
                 }
             }
         </style>
     </section>
 
+    <!-- 我们的足迹部分 -->
+    <section id="footprint-section" class="section">
+        <div class="footprint-content-card">
+            <h2 style="margin-bottom: 20px; text-align: center;">🗺️ 我们的足迹</h2>
+            
+            <!-- 地图容器 -->
+            <div id="footprint-map" style="width: 100% !important; height: 500px !important; border-radius: 15px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); overflow: visible !important; margin-bottom: 20px; position: relative !important; max-width: none !important; min-width: auto !important;">
+                <!-- 直接在HTML中的缩放按钮 -->
+                <div id="html-zoom-controls" style="position: absolute !important; top: 10px !important; right: 10px !important; z-index: 99999 !important; background: white !important; border-radius: 6px !important; box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important; overflow: hidden !important; border: 1px solid #ddd !important; pointer-events: auto !important; display: block !important; visibility: visible !important;">
+                    <button id="html-zoom-in" onclick="htmlZoomIn()" style="display: block !important; width: 32px !important; height: 32px !important; border: none !important; background: white !important; cursor: pointer !important; font-size: 20px !important; font-weight: bold !important; border-bottom: 1px solid #ddd !important; pointer-events: auto !important; position: relative !important; z-index: 99999 !important;" title="放大">+</button>
+                    <button id="html-zoom-out" onclick="htmlZoomOut()" style="display: block !important; width: 32px !important; height: 32px !important; border: none !important; background: white !important; cursor: pointer !important; font-size: 20px !important; font-weight: bold !important; pointer-events: auto !important; position: relative !important; z-index: 99999 !important;" title="缩小">−</button>
+                </div>
+                <!-- 测试按钮 -->
+                <button id="html-test-btn" onclick="htmlTestBtn()" style="position: absolute !important; top: 10px !important; left: 10px !important; z-index: 99999 !important; width: 50px !important; height: 30px !important; background: red !important; color: white !important; border: none !important; cursor: pointer !important; pointer-events: auto !important; display: block !important; visibility: visible !important;">TEST</button>
+            </div>
+            
+            <!-- 足迹列表 -->
+            <div class="footprint-list">
+                <h3 style="margin-bottom: 15px; color: #667eea;">📍 我们的回忆地点</h3>
+                <div id="footprint-places" class="footprint-places">
+                    <!-- 足迹地点将通过JavaScript动态生成 -->
+                </div>
+            </div>
+
+            <!-- 足迹页面样式 -->
+            <style>
+                .footprint-content-card {
+                    padding: 40px 20px 20px 20px;
+                    max-width: 1000px;
+                    margin: 0 auto;
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 20px;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+                    backdrop-filter: blur(10px);
+                }
+
+                .footprint-content-card h2 {
+                    color: #667eea;
+                    font-size: 2.5rem;
+                    margin-bottom: 30px;
+                    text-align: center;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                }
+
+                .footprint-list {
+                    margin-top: 30px;
+                }
+
+                .footprint-list h3 {
+                    font-size: 1.5rem;
+                    margin-bottom: 20px;
+                    color: #667eea;
+                }
+
+                .footprint-places {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 15px;
+                }
+
+                .footprint-place {
+                    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+                    border: 2px solid rgba(102, 126, 234, 0.2);
+                    border-radius: 15px;
+                    padding: 20px;
+                    transition: all 0.3s ease;
+                    cursor: pointer;
+                }
+
+                .footprint-place:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.3);
+                    border-color: rgba(102, 126, 234, 0.5);
+                }
+
+                .footprint-place-name {
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    color: #667eea;
+                    margin-bottom: 8px;
+                }
+
+                .footprint-place-date {
+                    font-size: 0.9rem;
+                    color: #764ba2;
+                    margin-bottom: 10px;
+                }
+
+                .footprint-place-description {
+                    font-size: 1rem;
+                    color: #555;
+                    line-height: 1.5;
+                }
+
+                .footprint-place-emoji {
+                    font-size: 1.5rem;
+                    float: right;
+                    margin-top: -5px;
+                }
+
+                /* 移动端优化 */
+                @media (max-width: 768px) {
+                    .footprint-content-card {
+                        padding: 20px 15px;
+                        margin: 0;
+                    }
+
+                    .footprint-content-card h2 {
+                        font-size: 2rem;
+                        margin-bottom: 20px;
+                    }
+
+                    #footprint-map {
+                        height: 350px;
+                        margin-bottom: 15px;
+                    }
+
+                    .footprint-places {
+                        grid-template-columns: 1fr;
+                        gap: 12px;
+                    }
+
+                    .footprint-place {
+                        padding: 15px;
+                    }
+
+                    .footprint-place-name {
+                        font-size: 1.1rem;
+                    }
+
+                    .footprint-list h3 {
+                        font-size: 1.3rem;
+                        margin-bottom: 15px;
+                    }
+                }
+
+                /* 超小屏幕优化 */
+                @media (max-width: 375px) {
+                    .footprint-content-card {
+                        padding: 15px 10px;
+                    }
+
+                    .footprint-content-card h2 {
+                        font-size: 1.8rem;
+                    }
+
+                    #footprint-map {
+                        height: 300px;
+                    }
+
+                    .footprint-place {
+                        padding: 12px;
+                    }
+
+                    .footprint-place-name {
+                        font-size: 1rem;
+                    }
+                }
+            </style>
+        </div>
+    </section>
+
     </div>
 
+    <!-- 照片/视频模态框 -->
+    <div id="photoModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <div class="modal-nav">
+                <button class="nav-btn prev-btn" onclick="showPrevMedia()" id="prevBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="nav-btn next-btn" onclick="showNextMedia()" id="nextBtn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div id="modalPhoto" class="modal-photo">📷</div>
+            <div class="modal-info">
+                <div id="modalCaption" class="modal-caption">照片描述</div>
+                <div id="modalDate" class="modal-date">日期</div>
+                <div id="mediaCounter" class="media-counter">1 / 1</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 高德地图JS API -->
+    <script src="https://webapi.amap.com/maps?v=2.0&key=42fcf5863a70517d01053d3407404f6b&plugin=AMap.Walking,AMap.Scale,AMap.ToolBar,AMap.ControlBar"></script>
     <script src="script.js"></script>
 </body>
 </html>

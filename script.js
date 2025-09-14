@@ -1347,23 +1347,198 @@ function addBirthdayAnimations() {
             z-index: -1;
         }
         
-        /* 响应式设计 */
+        /* 手机端深度优化 */
         @media (max-width: 768px) {
+            .birthday-celebration {
+                padding: 5rem 0.8rem 1rem 0.8rem !important;
+                margin-top: 60px !important;
+            }
+            
             .birthday-title {
-                font-size: 2.5rem;
+                font-size: 2rem !important;
+                margin-bottom: 1.2rem !important;
+                margin-top: 3rem !important;
+                line-height: 1.3 !important;
+                padding: 0 10px !important;
+            }
+            
+            .birthday-age {
+                flex-direction: column !important;
+                gap: 0.3rem !important;
+                margin: 1.2rem 0 !important;
             }
             
             .age-number {
-                font-size: 3rem;
+                font-size: 2.8rem !important;
+                line-height: 1 !important;
+            }
+            
+            .age-text {
+                font-size: 1.1rem !important;
+            }
+            
+            .birthday-celebration .couple-info {
+                flex-direction: column !important;
+                gap: 18px !important;
+                margin: 1.8rem 0 !important;
+            }
+            
+            .birthday-celebration .person {
+                transform: none !important;
+            }
+            
+            .birthday-celebration .avatar {
+                width: 65px !important;
+                height: 65px !important;
+                font-size: 45px !important;
+                margin-bottom: 8px !important;
+            }
+            
+            .birthday-celebration .person h3 {
+                font-size: 15px !important;
+                margin-bottom: 4px !important;
+            }
+            
+            .birthday-cake-center {
+                order: -1 !important;
+                margin-bottom: 8px !important;
+            }
+            
+            .cake-animation {
+                font-size: 2.2rem !important;
+            }
+            
+            .fireworks {
+                font-size: 1.3rem !important;
+            }
+            
+            .birthday-wish {
+                font-size: 11px !important;
+                margin-top: 4px !important;
+            }
+            
+            .birthday-message {
+                margin: 1.8rem 0.5rem !important;
             }
             
             .message-card {
-                padding: 1.5rem;
-                margin: 2rem 1rem;
+                padding: 1.3rem !important;
+                border-radius: 12px !important;
+                margin: 0 !important;
+            }
+            
+            .message-card h3 {
+                font-size: 1rem !important;
+                margin-bottom: 0.8rem !important;
+            }
+            
+            .message-card p {
+                font-size: 12px !important;
+                line-height: 1.5 !important;
+                margin: 0.3rem 0 !important;
+            }
+            
+            .birthday-signature {
+                font-size: 11px !important;
+                margin-top: 0.8rem !important;
             }
             
             .balloon {
-                font-size: 1.5rem;
+                font-size: 1.1rem !important;
+            }
+            
+            .birthday-star::before {
+                top: -4px !important;
+                right: -4px !important;
+                font-size: 0.9rem !important;
+            }
+        }
+        
+        /* 超小屏幕生日优化 */
+        @media (max-width: 375px) {
+            .birthday-celebration {
+                padding: 4rem 0.5rem 0.8rem 0.5rem !important;
+                margin-top: 50px !important;
+            }
+            
+            .birthday-title {
+                font-size: 1.7rem !important;
+                padding: 0 5px !important;
+                margin-top: 2.5rem !important;
+            }
+            
+            .age-number {
+                font-size: 2.3rem !important;
+            }
+            
+            .age-text {
+                font-size: 1rem !important;
+            }
+            
+            .birthday-celebration .avatar {
+                width: 55px !important;
+                height: 55px !important;
+                font-size: 40px !important;
+            }
+            
+            .birthday-celebration .person h3 {
+                font-size: 14px !important;
+            }
+            
+            .cake-animation {
+                font-size: 2rem !important;
+            }
+            
+            .message-card {
+                padding: 1rem !important;
+            }
+            
+            .message-card h3 {
+                font-size: 0.95rem !important;
+            }
+            
+            .message-card p {
+                font-size: 11px !important;
+            }
+            
+            .birthday-signature {
+                font-size: 10px !important;
+            }
+        }
+        
+        /* 横屏模式生日优化 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .birthday-celebration {
+                padding: 0.5rem !important;
+            }
+            
+            .birthday-title {
+                font-size: 1.5rem !important;
+                margin-bottom: 0.8rem !important;
+            }
+            
+            .birthday-age {
+                margin: 1rem 0 !important;
+            }
+            
+            .age-number {
+                font-size: 2.2rem !important;
+            }
+            
+            .birthday-celebration .couple-info {
+                flex-direction: row !important;
+                gap: 12px !important;
+                margin: 1.2rem 0 !important;
+            }
+            
+            .birthday-celebration .avatar {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 35px !important;
+            }
+            
+            .message-card {
+                padding: 1rem !important;
             }
         }
     `;
@@ -1387,11 +1562,19 @@ function startBirthdayTimer() {
             durationElement.innerHTML = `
                 <div class="time-unit">
                     <span class="time-number">${days}</span>
-                    <span class="time-label">天的美好时光</span>
+                    <span class="time-label">天</span>
                 </div>
-                <div class="birthday-love-message">
-                    <p>💖 在这${days}天里，每一天都因为有你而特别</p>
-                    <p>🎂 今天更是特别中的特别，因为是你的生日！</p>
+                <div class="time-unit">
+                    <span class="time-number">${hours}</span>
+                    <span class="time-label">时</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number">${minutes}</span>
+                    <span class="time-label">分</span>
+                </div>
+                <div class="time-unit">
+                    <span class="time-number">${seconds}</span>
+                    <span class="time-label">秒</span>
                 </div>
             `;
         }
@@ -1807,6 +1990,12 @@ function showSection(sectionId) {
     if (targetSection) {
         targetSection.classList.add('active');
         
+        // 使用 requestAnimationFrame 确保在浏览器下次重绘前滚动
+        // 这是解决时序问题的最可靠方法
+        requestAnimationFrame(() => {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        });
+        
         // 添加进入动画
         targetSection.style.animation = 'fadeInUp 0.6s ease-out';
         
@@ -2218,15 +2407,20 @@ async function fetchHoroscope(constellation, date = '') {
 
     try {
         console.log('正在请求星座运势API:', url.toString());
-        const response = await fetch(url, {
+        
+        const requestOptions = {
             method: 'GET',
             mode: 'cors',
             headers: {
+                'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
-        });
+        };
+        
+        const response = await fetch(url, requestOptions);
 
         if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}, statusText: ${response.statusText}`);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
@@ -2236,24 +2430,33 @@ async function fetchHoroscope(constellation, date = '') {
         if (data.code === 200 && data.result && data.result.list) {
             return parseHoroscopeData(data.result.list);
         } else {
-            console.error('星座运势API调用失败:', data.msg);
+            console.error('星座运势API调用失败:', data.msg || data);
             return null;
         }
     } catch (error) {
         console.error('星座运势API请求失败:', error);
-        // 返回测试数据，以便调试界面
-        return {
-            comprehensive: '85%',
-            love: '70%',
-            work: '75%',
-            money: '60%',
-            health: '70%',
-            luckyColor: '紫黑色',
-            luckyNumber: '6',
-            benefactor: '金牛座',
-            summary: '今天是充满挑战的一天，保持积极心态，好运会降临。'
-        };
+        return null;
     }
+}
+
+// 获取默认星座运势数据
+function getDefaultHoroscopeData(constellation) {
+    const defaultMessages = {
+        'capricorn': '摩羯座今天运势不错，工作上会有新的机会，感情方面需要多沟通。',
+        'virgo': '处女座今天适合整理思路，财运方面有小惊喜，保持积极心态。'
+    };
+    
+    return {
+        comprehensive: '85%',
+        love: Math.floor(Math.random() * 30 + 60) + '%',
+        work: Math.floor(Math.random() * 30 + 65) + '%', 
+        money: Math.floor(Math.random() * 25 + 55) + '%',
+        health: Math.floor(Math.random() * 25 + 70) + '%',
+        luckyColor: ['红色', '蓝色', '绿色', '紫色', '金色'][Math.floor(Math.random() * 5)],
+        luckyNumber: String(Math.floor(Math.random() * 9 + 1)),
+        benefactor: ['金牛座', '双子座', '巨蟹座', '狮子座', '天秤座'][Math.floor(Math.random() * 5)],
+        summary: defaultMessages[constellation] || '今天是充满机遇的一天，保持乐观心态，好运会降临。'
+    };
 }
 
 // 解析星座运势数据
@@ -2299,13 +2502,18 @@ async function fetchAllHoroscopes() {
 
     for (const [key, person] of Object.entries(HOROSCOPE_CONFIG.couples)) {
         console.log(`正在获取${person.name}的星座运势...`);
-        const horoscope = await fetchHoroscope(person.constellation);
-        if (horoscope) {
-            horoscopes[key] = {
-                ...person,
-                horoscope: horoscope
-            };
+        let horoscope = await fetchHoroscope(person.constellation);
+        
+        // 如果API失败，使用默认数据作为后备
+        if (!horoscope) {
+            console.log(`${person.name}的星座运势API失败，使用默认数据`);
+            horoscope = getDefaultHoroscopeData(person.constellation);
         }
+        
+        horoscopes[key] = {
+            ...person,
+            horoscope: horoscope
+        };
     }
 
     return horoscopes;
@@ -2366,7 +2574,7 @@ async function initHoroscope() {
         console.log('✨ 星座运势加载完成');
     } else {
         console.log('❌ 星座运势加载失败');
-        container.innerHTML = '<div class="horoscope-placeholder"><div class="horoscope-placeholder-icon">❌</div><p>星座运势加载失败，请稍后重试</p></div>';
+        container.innerHTML = '<div class="horoscope-placeholder"><div class="horoscope-placeholder-icon">❌</div><p>星座运势加载失败，请稍后重试</p><button onclick="initHoroscope()" style="margin-top: 10px; padding: 8px 16px; border: none; border-radius: 8px; background: #667eea; color: white; cursor: pointer;">🔄 重新加载</button></div>';
     }
 }
 
@@ -3765,7 +3973,7 @@ function createAnniversaryCard(anniversary, timeLeft, anniversaryDate) {
         : `<div class="anniversary-icon">${anniversary.icon}</div>`;
     
     return `
-        <div class="anniversary-card ${urgentClass}">
+        <div class="anniversary-card ${urgentClass}" style="margin-bottom: 15px !important; margin-top: 0 !important;">
             ${iconHtml}
             <div class="anniversary-title">${anniversary.title}</div>
             <div class="anniversary-countdown">${countdownText}</div>
@@ -3806,7 +4014,7 @@ function updateAnniversaries() {
     ).join('');
     
     container.innerHTML = cardsHTML || `
-        <div class="anniversary-card">
+        <div class="anniversary-card" style="margin-bottom: 15px !important; margin-top: 0 !important;">
             <div class="anniversary-icon">📅</div>
             <div class="anniversary-title">暂无纪念日</div>
             <div class="anniversary-countdown">期待下一个特殊的日子</div>
@@ -3959,5 +4167,572 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// 足迹地图初始化
+document.addEventListener('DOMContentLoaded', function() {
+    // 监听页面切换到足迹页面时初始化地图
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const footprintSection = document.getElementById('footprint-section');
+                if (footprintSection && footprintSection.classList.contains('active') && !footprintMap) {
+                    // 延迟初始化，确保DOM元素已准备好
+                    setTimeout(initFootprintMap, 100);
+                }
+            }
+        });
+    });
+
+    // 观察足迹页面的类变化
+    const footprintSection = document.getElementById('footprint-section');
+    if (footprintSection) {
+        observer.observe(footprintSection, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    // 如果直接加载到足迹页面，立即初始化
+    if (footprintSection && footprintSection.classList.contains('active')) {
+        setTimeout(initFootprintMap, 100);
+    }
+});
+
+// ==================== 足迹地图配置 ====================
+const FOOTPRINT_CONFIG = {
+    key: '42fcf5863a70517d01053d3407404f6b', // 高德地图API Key
+    places: [
+        {
+            name: '第一次青岛见面',
+            date: '2024-07-21',
+            coordinates: [120.13861,36.516013], // 你们实际见面的地点
+            description: '我们第一次在美丽的青岛见面，心情激动不已 🌊💕',
+            emoji: '💕',
+            type: 'meeting'
+        },
+        {
+            name: '青岛方特梦幻王国',
+            date: '2024-07-21',
+            coordinates: [120.283343, 36.208054], // 青岛方特
+            description: '一起在方特度过了欢乐的时光，各种刺激的游乐项目让我们笑声不断 🎢✨',
+            emoji: '🎢',
+            type: 'entertainment'
+        }
+    ]
+};
+
+// 足迹地图变量
+let footprintMap = null;
+let footprintMarkers = [];
+let footprintPolyline = null;
+
+// 初始化足迹地图
+function initFootprintMap() {
+    console.log('🗺️ 初始化足迹地图...');
+    
+    // 等待高德地图API加载完成
+    if (typeof AMap === 'undefined') {
+        console.log('⏳ 等待高德地图API加载...');
+        setTimeout(initFootprintMap, 500);
+        return;
+    }
+
+    try {
+        // 创建地图实例 - 完全自适应配置
+        footprintMap = new AMap.Map('footprint-map', {
+            zoom: 11,
+            center: [120.21, 36.36],
+            mapStyle: 'amap://styles/normal', // 改为普通样式，更稳定
+            viewMode: '2D', // 改为2D，避免3D带来的复杂性
+            resizeEnable: true, // 启用地图自适应调整
+            scrollWheel: true,
+            doubleClickZoom: true,
+            keyboardEnable: true,
+            dragEnable: true,
+            zoomEnable: true,
+            rotateEnable: false, // 禁用旋转，简化交互
+            pitchEnable: false, // 禁用倾斜，简化交互
+            animateEnable: true,
+            jogEnable: true,
+            isHotspot: false,
+            defaultCursor: 'pointer',
+            touchZoom: true, // 确保触摸缩放启用
+            touchZoomCenter: 1
+        });
+
+        console.log('✅ 高德地图实例创建成功');
+
+        // 地图加载完成后的处理
+        footprintMap.on('complete', function() {
+            console.log('🗺️ 地图加载完成，开始强制调整');
+            setTimeout(() => {
+                footprintMap.getViewport().resize();
+                console.log('🔄 强制地图重新调整尺寸');
+            }, 200);
+        });
+
+        // 添加足迹标记点
+        addFootprintMarkers();
+        
+        // 连接足迹路径
+        drawFootprintPath();
+        
+        // 渲染足迹列表
+        renderFootprintList();
+        
+        // 设置地图视野以包含所有标记点
+        setFootprintMapBounds();
+        
+        // 确保滚轮缩放启用
+        enableMapInteractions();
+        
+        // 添加窗口大小变化监听器，确保地图自适应
+        addMapResizeListener();
+        
+        // HTML按钮已经在HTML中创建，不需要JS动态创建
+        console.log('✅ 使用HTML中的缩放按钮');
+        
+        console.log('🎉 足迹地图初始化完成');
+        
+    } catch (error) {
+        console.error('❌ 足迹地图初始化失败:', error);
+        showFootprintError('地图加载失败，请刷新页面重试');
+    }
+}
+
+
+
+// 添加地图自适应调整
+function addMapResizeListener() {
+    try {
+        // 窗口大小变化时重新调整地图
+        window.addEventListener('resize', function() {
+            if (footprintMap) {
+                console.log('🖥️ 窗口大小变化，重新调整地图');
+                setTimeout(() => {
+                    footprintMap.getViewport().resize();
+                }, 100);
+            }
+        });
+        
+        // 监听页面可见性变化
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden && footprintMap) {
+                setTimeout(() => {
+                    footprintMap.getViewport().resize();
+                }, 100);
+            }
+        });
+        
+        console.log('✅ 地图自适应监听器已添加');
+    } catch (error) {
+        console.log('❌ 地图自适应监听器添加失败:', error);
+    }
+}
+
+// 确保地图交互功能启用
+function enableMapInteractions() {
+    try {
+        // 确保所有交互功能启用
+        footprintMap.setStatus({
+            scrollWheel: true,
+            doubleClickZoom: true,
+            keyboardEnable: true,
+            dragEnable: true,
+            zoomEnable: true,
+            rotateEnable: true,
+            pitchEnable: true
+        });
+        
+        console.log('✅ 地图交互功能已启用（包括滚轮缩放）');
+        
+        // 添加地图事件监听，确认交互正常
+        footprintMap.on('zoomchange', function() {
+            console.log('🔍 地图缩放级别改变为:', footprintMap.getZoom());
+        });
+        
+        footprintMap.on('click', function() {
+            console.log('👆 地图被点击，滚轮缩放已激活');
+        });
+        
+    } catch (error) {
+        console.log('❌ 启用地图交互功能失败:', error);
+    }
+}
+
+// 添加简单的缩放控件
+function addSimpleZoomControls() {
+    try {
+        console.log('🎯 开始添加缩放控件...');
+        
+        const mapContainer = document.getElementById('footprint-map');
+        if (!mapContainer) {
+            console.log('❌ 地图容器未找到');
+            return;
+        }
+
+        // 确保地图容器有相对定位
+        mapContainer.style.position = 'relative';
+
+        const zoomContainer = document.createElement('div');
+        zoomContainer.id = 'custom-zoom-controls';
+        zoomContainer.style.cssText = `
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            z-index: 99999 !important;
+            background: white !important;
+            border-radius: 6px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+            overflow: hidden !important;
+            border: 1px solid #ddd !important;
+            pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        `;
+
+        const zoomInBtn = document.createElement('button');
+        zoomInBtn.innerHTML = '+';
+        zoomInBtn.title = '放大';
+        zoomInBtn.style.cssText = `
+            display: block !important;
+            width: 32px !important;
+            height: 32px !important;
+            border: none !important;
+            background: white !important;
+            cursor: pointer !important;
+            font-size: 20px !important;
+            font-weight: bold !important;
+            border-bottom: 1px solid #ddd !important;
+            transition: background-color 0.2s !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 99999 !important;
+        `;
+        
+        zoomInBtn.onmouseover = () => zoomInBtn.style.backgroundColor = '#f0f0f0';
+        zoomInBtn.onmouseout = () => zoomInBtn.style.backgroundColor = 'white';
+        zoomInBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🔍 点击放大按钮');
+            if (footprintMap) {
+                const currentZoom = footprintMap.getZoom();
+                footprintMap.setZoom(currentZoom + 1);
+                console.log('✅ 地图放大成功，当前缩放级别:', footprintMap.getZoom());
+            }
+        };
+
+        zoomInBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🔍 addEventListener: 点击放大按钮');
+            if (footprintMap) {
+                const currentZoom = footprintMap.getZoom();
+                footprintMap.setZoom(currentZoom + 1);
+            }
+        });
+
+        const zoomOutBtn = document.createElement('button');
+        zoomOutBtn.innerHTML = '−';
+        zoomOutBtn.title = '缩小';
+        zoomOutBtn.style.cssText = `
+            display: block !important;
+            width: 32px !important;
+            height: 32px !important;
+            border: none !important;
+            background: white !important;
+            cursor: pointer !important;
+            font-size: 20px !important;
+            font-weight: bold !important;
+            transition: background-color 0.2s !important;
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 99999 !important;
+        `;
+        
+        zoomOutBtn.onmouseover = () => zoomOutBtn.style.backgroundColor = '#f0f0f0';
+        zoomOutBtn.onmouseout = () => zoomOutBtn.style.backgroundColor = 'white';
+        zoomOutBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🔍 点击缩小按钮');
+            if (footprintMap) {
+                const currentZoom = footprintMap.getZoom();
+                footprintMap.setZoom(currentZoom - 1);
+                console.log('✅ 地图缩小成功，当前缩放级别:', footprintMap.getZoom());
+            }
+        };
+
+        zoomOutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🔍 addEventListener: 点击缩小按钮');
+            if (footprintMap) {
+                const currentZoom = footprintMap.getZoom();
+                footprintMap.setZoom(currentZoom - 1);
+            }
+        });
+
+        zoomContainer.appendChild(zoomInBtn);
+        zoomContainer.appendChild(zoomOutBtn);
+        mapContainer.appendChild(zoomContainer);
+        
+        // 添加测试按钮
+        const testBtn = document.createElement('button');
+        testBtn.innerHTML = 'TEST';
+        testBtn.style.cssText = `
+            position: absolute !important;
+            top: 10px !important;
+            left: 10px !important;
+            z-index: 99999 !important;
+            width: 50px !important;
+            height: 30px !important;
+            background: red !important;
+            color: white !important;
+            border: none !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
+            display: block !important;
+            visibility: visible !important;
+        `;
+        testBtn.onclick = () => {
+            alert('测试按钮工作！现在缩放级别: ' + footprintMap.getZoom());
+            console.log('🧪 测试按钮被点击');
+        };
+        mapContainer.appendChild(testBtn);
+        
+        console.log('✅ 缩放控件添加成功');
+        console.log('🧪 添加了红色测试按钮，请点击验证事件是否工作');
+    } catch (error) {
+        console.log('❌ 缩放控件添加失败:', error);
+    }
+}
+
+// 添加足迹标记点
+function addFootprintMarkers() {
+    FOOTPRINT_CONFIG.places.forEach((place, index) => {
+        // 创建标记点
+        const marker = new AMap.Marker({
+            position: place.coordinates,
+            title: place.name,
+            offset: new AMap.Pixel(-15, -30),
+            content: createMarkerContent(place, index + 1)
+        });
+
+        // 添加点击事件
+        marker.on('click', function() {
+            showPlaceInfo(place);
+        });
+
+        // 添加到地图
+        footprintMap.add(marker);
+        footprintMarkers.push(marker);
+    });
+}
+
+// 创建标记点内容
+function createMarkerContent(place, number) {
+    return `
+        <div class="footprint-marker" style="
+            position: relative;
+            width: 30px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px 15px 15px 5px;
+            border: 2px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        " onmouseover="this.style.transform='translateY(-5px) scale(1.1)'" 
+           onmouseout="this.style.transform='translateY(-2px) scale(1)'">
+            ${number}
+            <div style="
+                position: absolute;
+                top: -10px;
+                right: -10px;
+                font-size: 16px;
+                z-index: 10;
+            ">${place.emoji}</div>
+        </div>
+    `;
+}
+
+// 绘制足迹路径
+function drawFootprintPath() {
+    // 按日期排序地点
+    const sortedPlaces = [...FOOTPRINT_CONFIG.places].sort((a, b) => 
+        new Date(a.date) - new Date(b.date)
+    );
+
+    // 创建路径坐标数组
+    const pathCoordinates = sortedPlaces.map(place => place.coordinates);
+
+    // 创建线路
+    footprintPolyline = new AMap.Polyline({
+        path: pathCoordinates,
+        strokeColor: '#667eea',
+        strokeWeight: 4,
+        strokeOpacity: 0.8,
+        strokeStyle: 'solid',
+        lineJoin: 'round',
+        lineCap: 'round',
+        showDir: true, // 显示方向箭头
+        isOutline: true,
+        outlineColor: 'white',
+        borderWeight: 2
+    });
+
+    footprintMap.add(footprintPolyline);
+}
+
+// 设置地图视野包含所有标记点
+function setFootprintMapBounds() {
+    if (footprintMarkers.length > 0) {
+        footprintMap.setFitView(footprintMarkers, false, [50, 50, 50, 50]);
+    }
+}
+
+// 显示地点详情
+function showPlaceInfo(place) {
+    const infoWindow = new AMap.InfoWindow({
+        anchor: 'bottom-center',
+        offset: new AMap.Pixel(0, -40),
+        content: `
+            <div style="padding: 15px; max-width: 250px;">
+                <h3 style="margin: 0 0 8px 0; color: #667eea; font-size: 16px;">
+                    ${place.emoji} ${place.name}
+                </h3>
+                <p style="margin: 0 0 8px 0; color: #764ba2; font-size: 12px;">
+                    📅 ${place.date}
+                </p>
+                <p style="margin: 0; color: #555; font-size: 14px; line-height: 1.4;">
+                    ${place.description}
+                </p>
+            </div>
+        `
+    });
+
+    infoWindow.open(footprintMap, place.coordinates);
+}
+
+// 渲染足迹列表
+function renderFootprintList() {
+    const container = document.getElementById('footprint-places');
+    if (!container) return;
+
+    // 按日期排序
+    const sortedPlaces = [...FOOTPRINT_CONFIG.places].sort((a, b) => 
+        new Date(a.date) - new Date(b.date)
+    );
+
+    const placesHTML = sortedPlaces.map((place, index) => `
+        <div class="footprint-place" onclick="focusOnPlace(${index})" data-place-index="${index}">
+            <span class="footprint-place-emoji">${place.emoji}</span>
+            <div class="footprint-place-name">${place.name}</div>
+            <div class="footprint-place-date">📅 ${place.date}</div>
+            <div class="footprint-place-description">${place.description}</div>
+        </div>
+    `).join('');
+
+    container.innerHTML = placesHTML;
+}
+
+// 点击足迹列表项，聚焦到地图上的标记点
+function focusOnPlace(index) {
+    if (!footprintMap || !FOOTPRINT_CONFIG.places[index]) return;
+
+    const place = FOOTPRINT_CONFIG.places[index];
+    const position = new AMap.LngLat(place.coordinates[0], place.coordinates[1]);
+
+    // 根据地点设置不同的缩放级别
+    const zoomLevel = index === 0 ? 17 : 15; // "第一次见面"的缩放级别设为17，更近一些
+
+    // 移动地图中心并放大
+    footprintMap.setZoomAndCenter(zoomLevel, position, false, 1000);
+
+    // 显示信息窗体
+    showPlaceInfo(index);
+}
+
+// 显示足迹错误信息
+function showFootprintError(message) {
+    const container = document.getElementById('footprint-map');
+    if (container) {
+        container.innerHTML = `
+            <div style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                border-radius: 15px;
+                color: #666;
+                text-align: center;
+                padding: 40px;
+            ">
+                <div style="font-size: 3rem; margin-bottom: 20px;">🗺️</div>
+                <h3 style="margin: 0 0 10px 0; color: #e74c3c;">地图加载失败</h3>
+                <p style="margin: 0; color: #7f8c8d;">${message}</p>
+                <button onclick="initFootprintMap()" style="
+                    margin-top: 20px;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 8px;
+                    background: #667eea;
+                    color: white;
+                    cursor: pointer;
+                    font-size: 14px;
+                ">🔄 重新加载</button>
+            </div>
+        `;
+    }
+}
+
+// ==================== HTML按钮处理函数 ====================
+// 这些函数直接在HTML中调用，避免事件绑定问题
+
+function htmlTestBtn() {
+    console.log('🧪 HTML测试按钮被点击');
+    if (footprintMap) {
+        alert('HTML按钮工作！当前缩放级别: ' + footprintMap.getZoom());
+    } else {
+        alert('地图未初始化');
+    }
+}
+
+function htmlZoomIn() {
+    console.log('🔍 HTML放大按钮被点击');
+    if (footprintMap) {
+        const currentZoom = footprintMap.getZoom();
+        footprintMap.setZoom(currentZoom + 1);
+        console.log('✅ 地图放大成功，当前缩放级别:', footprintMap.getZoom());
+    } else {
+        console.log('❌ 地图未初始化');
+    }
+}
+
+function htmlZoomOut() {
+    console.log('🔍 HTML缩小按钮被点击');
+    if (footprintMap) {
+        const currentZoom = footprintMap.getZoom();
+        footprintMap.setZoom(currentZoom - 1);
+        console.log('✅ 地图缩小成功，当前缩放级别:', footprintMap.getZoom());
+    } else {
+        console.log('❌ 地图未初始化');
+    }
+}
+
+// 让这些函数全局可用
+window.htmlTestBtn = htmlTestBtn;
+window.htmlZoomIn = htmlZoomIn;
+window.htmlZoomOut = htmlZoomOut;
+
 console.log('💕 静态爱情网站脚本加载完成 - 奕铭 & 佳怡');
 console.log('🌙 周公解梦功能已启用');
+console.log('🗺️ 足迹地图功能已启用');
+console.log('🎯 HTML按钮函数已注册');
