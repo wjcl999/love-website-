@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎂 佳怡生日快乐！ - 我们的爱情时光</title>
+    
+    <!-- 防缓存配置 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- 临时脚本：强制启用生日模式 -->
+    <script>
+    window.FORCE_BIRTHDAY_MODE = true;
+    </script>
+</head>
+<body>
+    <div class="background">
+        <div class="hearts"></div>
+    </div>
+
+    <div class="container">
+        <!-- 头部导航 -->
+        <nav class="navbar">
+            <div class="nav-brand">🎂 佳怡生日快乐！</div>
+            <div class="nav-links">
+                <a href="#home" data-target="home-section" class="active">
+                    <i class="fas fa-heart"></i>
+                    <span>生日主页</span>
+                </a>
+                <a href="#timeline" data-target="timeline-section">
+                    <i class="fas fa-clock"></i>
+                    <span>时光轴</span>
+                </a>
+                <a href="#gallery" data-target="gallery-section">
+                    <i class="fas fa-images"></i>
+                    <span>相册</span>
+                </a>
+                <a href="#weather" data-target="weather-section">
+                    <i class="fas fa-cloud-sun"></i>
+                    <span>天气</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- 首页部分 -->
+        <section id="home-section" class="section active">
+            <div class="hero">
+                <!-- 生日内容将通过JavaScript动态生成 -->
+            </div>
+        </section>
+
+        <!-- 时光轴部分 -->
+        <section id="timeline-section" class="section">
+            <h2>💖 重要时刻</h2>
+            <div class="timeline" id="timelineContainer">
+                <!-- 时光轴项目将通过JavaScript动态加载 -->
+                <div class="timeline-placeholder">
+                    <div class="timeline-placeholder-icon">⏰</div>
+                    <p>美好时光轴记录即将呈现，敬请期待...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 相册部分 -->
+        <section id="gallery-section" class="section">
+            <h2>📸 甜蜜回忆</h2>
+            
+            <!-- 相册分类导航 -->
+            <div class="gallery-tabs">
+                <button class="tab-btn active" data-category="all" onclick="showGalleryCategory('all')">全部</button>
+                <button class="tab-btn" data-category="first_date" onclick="showGalleryCategory('first_date')">第一次约会</button>
+                <button class="tab-btn" data-category="travel" onclick="showGalleryCategory('travel')">一起旅行</button>
+                <button class="tab-btn" data-category="daily_life" onclick="showGalleryCategory('daily_life')">日常生活</button>
+                <button class="tab-btn" data-category="festivals" onclick="showGalleryCategory('festivals')">节日庆祝</button>
+            </div>
+            
+            <div class="gallery" id="photoGallery">
+                <!-- 照片将通过JavaScript动态加载 -->
+                <div class="photo-placeholder-hint">
+                    <div class="photo-placeholder">📷</div>
+                    <p>甜蜜照片即将展示，美好回忆值得期待...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 天气信息部分 -->
+        <section id="weather-section" class="section">
+            <h2>💕 彼此的天气</h2>
+            <div class="weather-container" id="weather-container">
+                <div class="weather-placeholder">
+                    <div class="weather-placeholder-icon">🌤️</div>
+                    <p>天气信息加载中，请稍候...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 照片模态框 -->
+    <div id="photoModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <div id="modalPhoto" class="modal-photo">📷</div>
+        </div>
+    </div>
+
+    <script>
+    // 临时修改生日检测函数，强制返回true
+    window.originalScript = true;
+    </script>
+    <script src="script.js"></script>
+    <script>
+    // 强制启用生日模式
+    if (window.FORCE_BIRTHDAY_MODE) {
+        // 重写生日检测函数
+        window.isBirthdayToday = function() {
+            return true;
+        };
+        
+        // 重新初始化（如果需要）
+        if (typeof initBirthdayMode === 'function') {
+            console.log('🎂 强制启用生日模式进行测试');
+        }
+    }
+    </script>
+</body>
+</html> 

@@ -37,9 +37,17 @@
                     <i class="fas fa-images"></i>
                     <span>相册</span>
                 </a>
+                <a href="#horoscope" data-target="horoscope-section">
+                    <i class="fas fa-star"></i>
+                    <span>运势</span>
+                </a>
                 <a href="#weather" data-target="weather-section">
                     <i class="fas fa-cloud-sun"></i>
                     <span>天气</span>
+                </a>
+                <a href="#dream" data-target="dream-section">
+                    <i class="fas fa-moon"></i>
+                    <span>解梦</span>
                 </a>
             </div>
         </nav>
@@ -85,7 +93,7 @@
                 <!-- 时光轴项目将通过JavaScript动态加载 -->
                 <div class="timeline-placeholder">
                     <div class="timeline-placeholder-icon">⏰</div>
-                    <p>还没有时光轴记录，快去管理后台添加吧~</p>
+                    <p>美好时光轴记录即将呈现，敬请期待...</p>
                 </div>
             </div>
         </section>
@@ -97,19 +105,197 @@
             <!-- 相册分类导航 -->
             <div class="gallery-tabs">
                 <button class="tab-btn active" data-category="all" onclick="showGalleryCategory('all')">全部</button>
-                <button class="tab-btn" data-category="first_date" onclick="showGalleryCategory('first_date')">第一次约会</button>
-                <button class="tab-btn" data-category="travel" onclick="showGalleryCategory('travel')">一起旅行</button>
-                <button class="tab-btn" data-category="daily_life" onclick="showGalleryCategory('daily_life')">日常生活</button>
-                <button class="tab-btn" data-category="festivals" onclick="showGalleryCategory('festivals')">节日庆祝</button>
+                <button class="tab-btn" data-category="first_meet" onclick="showGalleryCategory('first_meet')">第一次见面</button>
+                <button class="tab-btn" data-category="second_meet" onclick="showGalleryCategory('second_meet')">第二次见面</button>
+                <button class="tab-btn" data-category="third_meet" onclick="showGalleryCategory('third_meet')">第三次见面</button>
+                <button class="tab-btn" data-category="first_gift" onclick="showGalleryCategory('first_gift')">第一次送你礼物</button>
+                <button class="tab-btn" data-category="colorful_you" onclick="showGalleryCategory('colorful_you')">多姿多彩的你</button>
+                <button class="tab-btn" data-category="secret_photos" onclick="showGalleryCategory('secret_photos')">偷偷保存的你</button>
             </div>
             
             <div class="gallery" id="photoGallery">
                 <!-- 照片将通过JavaScript动态加载 -->
                 <div class="photo-placeholder-hint">
                     <div class="photo-placeholder">📷</div>
-                    <p>还没有照片，快去管理后台上传吧~</p>
+                    <p>甜蜜照片即将展示，美好回忆值得期待...</p>
                 </div>
             </div>
+        </section>
+
+        <!-- 星座运势部分 -->
+        <section id="horoscope-section" class="section">
+            <h2>🔮 今日星座运势</h2>
+            <div id="horoscope-container" style="max-width: 800px; margin: 20px auto; padding: 20px; display: block;">
+                <div class="horoscope-placeholder">
+                    <div class="horoscope-placeholder-icon">✨</div>
+                    <p>星座运势加载中，请稍候...</p>
+                </div>
+            </div>
+            
+            <!-- 美化的运势样式 -->
+            <style>
+                #horoscope-container .fortune-cards {
+                    display: block !important;
+                    width: 100% !important;
+                    margin-top: 20px !important;
+                }
+                
+                #horoscope-container .fortune-card {
+                    display: block !important;
+                    width: 100% !important;
+                    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.9)) !important;
+                    border: none !important;
+                    border-radius: 20px !important;
+                    padding: 30px !important;
+                    margin-bottom: 25px !important;
+                    box-shadow: 
+                        0 10px 30px rgba(0,0,0,0.1),
+                        0 1px 8px rgba(0,0,0,0.1) !important;
+                    backdrop-filter: blur(10px) !important;
+                    transition: all 0.3s ease !important;
+                    position: relative !important;
+                    overflow: hidden !important;
+                }
+                
+                #horoscope-container .fortune-card:hover {
+                    transform: translateY(-5px) !important;
+                    box-shadow: 
+                        0 15px 40px rgba(0,0,0,0.15),
+                        0 5px 15px rgba(0,0,0,0.1) !important;
+                }
+                
+                #horoscope-container .fortune-card::before {
+                    content: '' !important;
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    height: 5px !important;
+                    border-radius: 20px 20px 0 0 !important;
+                }
+                
+                #horoscope-container .boy-card {
+                    background: linear-gradient(135deg, #f0f8ff, #e6f3ff) !important;
+                }
+                
+                #horoscope-container .boy-card::before {
+                    background: linear-gradient(90deg, #4facfe, #00f2fe) !important;
+                }
+                
+                #horoscope-container .girl-card {
+                    background: linear-gradient(135deg, #fff0f8, #ffe6f2) !important;
+                }
+                
+                #horoscope-container .girl-card::before {
+                    background: linear-gradient(90deg, #ff6b9d, #c44569) !important;
+                }
+                
+                #horoscope-container .horoscope-title {
+                    font-size: 2em !important;
+                    font-weight: 700 !important;
+                    margin-bottom: 20px !important;
+                    text-align: center !important;
+                    display: block !important;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+                }
+                
+                #horoscope-container .boy-card .horoscope-title {
+                    color: #4facfe !important;
+                }
+                
+                #horoscope-container .girl-card .horoscope-title {
+                    color: #ff6b9d !important;
+                }
+                
+                #horoscope-container .horoscope-content {
+                    line-height: 1.7 !important;
+                    font-size: 1.05em !important;
+                    color: #2d3748 !important;
+                    margin-bottom: 20px !important;
+                    padding: 20px !important;
+                    background: rgba(255,255,255,0.6) !important;
+                    border-radius: 15px !important;
+                    display: block !important;
+                    border-left: 4px solid transparent !important;
+                }
+                
+                #horoscope-container .boy-card .horoscope-content {
+                    border-left-color: #4facfe !important;
+                }
+                
+                #horoscope-container .girl-card .horoscope-content {
+                    border-left-color: #ff6b9d !important;
+                }
+                
+                #horoscope-container .horoscope-stats {
+                    display: flex !important;
+                    flex-wrap: wrap !important;
+                    gap: 12px !important;
+                    justify-content: center !important;
+                }
+                
+                #horoscope-container .horoscope-stat {
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    background: rgba(255,255,255,0.8) !important;
+                    padding: 12px 18px !important;
+                    border-radius: 25px !important;
+                    border: 2px solid transparent !important;
+                    font-size: 0.95em !important;
+                    font-weight: 600 !important;
+                    transition: all 0.3s ease !important;
+                    backdrop-filter: blur(5px) !important;
+                }
+                
+                #horoscope-container .horoscope-stat:hover {
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+                }
+                
+                #horoscope-container .boy-card .horoscope-stat {
+                    border-color: #4facfe !important;
+                    color: #2b6cb0 !important;
+                }
+                
+                #horoscope-container .boy-card .horoscope-stat:hover {
+                    background: rgba(79, 172, 254, 0.1) !important;
+                }
+                
+                #horoscope-container .girl-card .horoscope-stat {
+                    border-color: #ff6b9d !important;
+                    color: #d53f8c !important;
+                }
+                
+                #horoscope-container .girl-card .horoscope-stat:hover {
+                    background: rgba(255, 107, 157, 0.1) !important;
+                }
+                
+                /* 响应式优化 */
+                @media (max-width: 768px) {
+                    #horoscope-container .fortune-card {
+                        padding: 20px !important;
+                        margin-bottom: 20px !important;
+                    }
+                    
+                    #horoscope-container .horoscope-title {
+                        font-size: 1.6em !important;
+                    }
+                    
+                    #horoscope-container .horoscope-content {
+                        padding: 15px !important;
+                        font-size: 1em !important;
+                    }
+                    
+                    #horoscope-container .horoscope-stats {
+                        gap: 8px !important;
+                    }
+                    
+                    #horoscope-container .horoscope-stat {
+                        padding: 8px 12px !important;
+                        font-size: 0.9em !important;
+                    }
+                }
+            </style>
         </section>
 
         <!-- 天气信息部分 -->
@@ -124,12 +310,346 @@
         </section>
     </div>
 
-    <!-- 照片模态框 -->
+    <!-- 照片/视频模态框 -->
     <div id="photoModal" class="modal">
         <span class="close" onclick="closeModal()">&times;</span>
         <div class="modal-content">
+            <div class="modal-nav">
+                <button class="nav-btn prev-btn" onclick="showPrevMedia()" id="prevBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="nav-btn next-btn" onclick="showNextMedia()" id="nextBtn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
             <div id="modalPhoto" class="modal-photo">📷</div>
+            <div class="modal-info">
+                <div id="modalCaption" class="modal-caption">照片描述</div>
+                <div id="modalDate" class="modal-date">日期</div>
+                <div id="mediaCounter" class="media-counter">1 / 1</div>
+            </div>
         </div>
+    </div>
+
+    <!-- 周公解梦部分 -->
+    <section id="dream-section" class="section" style="padding-top: 10px !important; margin-top: -800px !important; min-height: auto !important; position: relative !important; z-index: 999 !important;">
+        <h2 style="margin-bottom: 20px !important; margin-top: 0 !important;">🌙 周公解梦</h2>
+        
+        <!-- 搜索框 -->
+        <div class="dream-search-container" style="max-width: 600px !important; margin: 10px auto 30px auto !important; text-align: center !important; display: block !important;">
+            <div class="dream-search-box" style="display: flex !important; gap: 10px !important; margin-bottom: 15px !important; background: rgba(255,255,255,0.9) !important; padding: 8px !important; border-radius: 25px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; backdrop-filter: blur(10px) !important;">
+                <input type="text" id="dreamKeyword" placeholder="输入你的梦境关键词，比如：黄瓜、火车、飞行..." maxlength="20" style="flex: 1 !important; border: none !important; padding: 12px 20px !important; border-radius: 20px !important; font-size: 1em !important; outline: none !important; background: rgba(255,255,255,0.8) !important; transition: all 0.3s ease !important; display: block !important;">
+                <button onclick="searchDream()" class="dream-search-btn" style="background: linear-gradient(135deg, #667eea, #764ba2) !important; color: white !important; border: none !important; padding: 12px 20px !important; border-radius: 20px !important; cursor: pointer !important; font-weight: 600 !important; transition: all 0.3s ease !important; min-width: 80px !important; display: block !important;">
+                    <i class="fas fa-search"></i>
+                    解梦
+                </button>
+            </div>
+            <p class="dream-tip" style="color: #666 !important; font-size: 0.9em !important; margin: 0 !important; font-style: italic !important; display: block !important;">💡 输入梦境中的关键词，AI将为你解析梦境含义</p>
+        </div>
+
+        <!-- 解梦结果 -->
+        <div class="dream-results" id="dreamResults">
+            <div class="dream-placeholder">
+                <div class="dream-placeholder-icon">🔮</div>
+                <h3>探索你的梦境世界</h3>
+                <p>梦境是潜意识的窗口，输入关键词开始你的解梦之旅吧！</p>
+            </div>
+        </div>
+
+        <!-- 热门梦境推荐 -->
+        <div class="dream-hot-keywords">
+            <h3>🔥 热门梦境</h3>
+            <div class="dream-keywords">
+                <span class="dream-keyword" onclick="quickSearch('飞行')">✈️ 飞行</span>
+                <span class="dream-keyword" onclick="quickSearch('水')">💧 水</span>
+                <span class="dream-keyword" onclick="quickSearch('蛇')">🐍 蛇</span>
+                <span class="dream-keyword" onclick="quickSearch('花')">🌸 花</span>
+                <span class="dream-keyword" onclick="quickSearch('汽车')">🚗 汽车</span>
+                <span class="dream-keyword" onclick="quickSearch('房子')">🏠 房子</span>
+                <span class="dream-keyword" onclick="quickSearch('动物')">🐱 动物</span>
+                <span class="dream-keyword" onclick="quickSearch('结婚')">💒 结婚</span>
+            </div>
+        </div>
+        
+        <!-- 强制解梦样式 -->
+        <style>
+            /* 解梦页面特殊padding调整 */
+            #dream-section {
+                padding-top: 80px !important;
+                margin-top: 0 !important;
+                min-height: auto !important;
+            }
+            
+            #dream-section h2 {
+                margin-bottom: 20px !important;
+                margin-top: 0 !important;
+            }
+            
+            /* 桌面端调整 */
+            @media (min-width: 769px) {
+                #dream-section {
+                    padding-top: 80px !important;
+                }
+            }
+            
+            /* 移动端调整 */
+            @media (max-width: 768px) {
+                #dream-section {
+                    padding-top: 90px !important;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                #dream-section {
+                    padding-top: 85px !important;
+                }
+            }
+            
+            #dream-section .dream-search-container {
+                max-width: 600px !important;
+                margin: 10px auto 30px auto !important;
+                text-align: center !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-search-box {
+                display: flex !important;
+                gap: 10px !important;
+                margin-bottom: 15px !important;
+                background: rgba(255,255,255,0.9) !important;
+                padding: 8px !important;
+                border-radius: 25px !important;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+                backdrop-filter: blur(10px) !important;
+            }
+            
+            #dream-section #dreamKeyword {
+                flex: 1 !important;
+                border: none !important;
+                padding: 12px 20px !important;
+                border-radius: 20px !important;
+                font-size: 1em !important;
+                outline: none !important;
+                background: rgba(255,255,255,0.8) !important;
+                transition: all 0.3s ease !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-search-btn {
+                background: linear-gradient(135deg, #667eea, #764ba2) !important;
+                color: white !important;
+                border: none !important;
+                padding: 12px 20px !important;
+                border-radius: 20px !important;
+                cursor: pointer !important;
+                font-weight: 600 !important;
+                transition: all 0.3s ease !important;
+                min-width: 80px !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-tip {
+                color: #666 !important;
+                font-size: 0.9em !important;
+                margin: 0 !important;
+                font-style: italic !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-results {
+                max-width: 800px !important;
+                margin: 30px auto !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-placeholder {
+                text-align: center !important;
+                padding: 40px 20px !important;
+                background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.8)) !important;
+                border-radius: 20px !important;
+                backdrop-filter: blur(10px) !important;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+                border: 1px solid rgba(102, 126, 234, 0.1) !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-placeholder-icon {
+                font-size: 3em !important;
+                margin-bottom: 15px !important;
+                animation: dreamFloat 3s ease-in-out infinite !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-placeholder h3 {
+                color: #667eea !important;
+                margin-bottom: 10px !important;
+                font-weight: 600 !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-placeholder p {
+                color: #666 !important;
+                margin: 0 !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-hot-keywords {
+                max-width: 800px !important;
+                margin: 40px auto !important;
+                text-align: center !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-hot-keywords h3 {
+                color: #667eea !important;
+                margin-bottom: 20px !important;
+                font-weight: 600 !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-keywords {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 10px !important;
+                justify-content: center !important;
+            }
+            
+            #dream-section .dream-keyword {
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1)) !important;
+                color: #667eea !important;
+                padding: 8px 16px !important;
+                border-radius: 20px !important;
+                cursor: pointer !important;
+                transition: all 0.3s ease !important;
+                border: 2px solid rgba(102, 126, 234, 0.2) !important;
+                font-weight: 500 !important;
+                user-select: none !important;
+                display: inline-block !important;
+            }
+            
+            #dream-section .dream-keyword:hover {
+                background: linear-gradient(135deg, #667eea, #764ba2) !important;
+                color: white !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3) !important;
+            }
+            
+            #dream-section .dream-card {
+                background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.9)) !important;
+                border-radius: 15px !important;
+                padding: 25px !important;
+                margin-bottom: 20px !important;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.1) !important;
+                backdrop-filter: blur(10px) !important;
+                border-left: 4px solid #667eea !important;
+                transition: all 0.3s ease !important;
+                border: 1px solid rgba(255,255,255,0.3) !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-card:hover {
+                transform: translateY(-3px) !important;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+                border-left-color: #764ba2 !important;
+            }
+            
+            #dream-section .dream-card-title {
+                font-size: 1.3em !important;
+                font-weight: 700 !important;
+                color: #667eea !important;
+                margin-bottom: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+                flex-wrap: wrap !important;
+            }
+            
+            #dream-section .dream-card-type {
+                background: linear-gradient(135deg, #667eea, #764ba2) !important;
+                color: white !important;
+                padding: 4px 12px !important;
+                border-radius: 15px !important;
+                font-size: 0.8em !important;
+                font-weight: 500 !important;
+                flex-shrink: 0 !important;
+                display: inline-block !important;
+            }
+            
+            #dream-section .dream-card-content {
+                line-height: 1.7 !important;
+                color: #2d3748 !important;
+                font-size: 1em !important;
+                text-align: left !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-loading {
+                text-align: center !important;
+                padding: 40px 20px !important;
+                background: rgba(255,255,255,0.9) !important;
+                border-radius: 15px !important;
+                backdrop-filter: blur(10px) !important;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-loading-icon {
+                font-size: 2em !important;
+                animation: dreamSpin 2s linear infinite !important;
+                margin-bottom: 10px !important;
+                color: #667eea !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-error {
+                text-align: center !important;
+                padding: 30px 20px !important;
+                background: linear-gradient(135deg, rgba(255, 99, 99, 0.1), rgba(255, 162, 162, 0.1)) !important;
+                border-radius: 15px !important;
+                border: 2px solid rgba(255, 99, 99, 0.2) !important;
+                color: #e53e3e !important;
+                display: block !important;
+            }
+            
+            #dream-section .dream-error h3 {
+                margin-bottom: 10px !important;
+                color: #e53e3e !important;
+                display: block !important;
+            }
+            
+            /* 响应式优化 */
+            @media (max-width: 768px) {
+                #dream-section .dream-search-box {
+                    flex-direction: column !important;
+                    gap: 15px !important;
+                    padding: 15px !important;
+                }
+                
+                #dream-section .dream-keywords {
+                    gap: 8px !important;
+                    padding: 0 15px !important;
+                }
+                
+                #dream-section .dream-keyword {
+                    padding: 6px 12px !important;
+                    font-size: 0.9em !important;
+                }
+                
+                #dream-section .dream-card {
+                    padding: 20px !important;
+                    margin: 0 15px 20px 15px !important;
+                }
+                
+                #dream-section .dream-card-title {
+                    font-size: 1.2em !important;
+                    flex-direction: column !important;
+                    align-items: flex-start !important;
+                    gap: 8px !important;
+                }
+            }
+        </style>
+    </section>
+
     </div>
 
     <script src="script.js"></script>

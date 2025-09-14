@@ -14,7 +14,9 @@
       "WebSearch",
       "WebFetch(domain:www.sojson.com)",
       "WebFetch(domain:api.yinwu.info)",
-      "WebFetch(domain:www.huangli123.net)"
+      "WebFetch(domain:www.huangli123.net)",
+      "Read(//d/**)",
+      "Bash(sed:*)"
     ],
     "deny": [],
     "ask": []
