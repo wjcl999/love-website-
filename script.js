@@ -1017,24 +1017,29 @@ function isBirthdayToday() {
     // ========== 取消注释下面这行来永久测试生日页面 ==========
     // return true;
 
-    // 获取北京时间 (UTC+8)
+    // 获取北京时间 (UTC+8) - 修复：无论访问者在什么时区都能正确获取北京时间
     const now = new Date();
-    const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-    const today = beijingTime;
-    const currentYear = today.getFullYear();
-    
+    // 将当前时间转换为UTC毫秒数，然后加8小时得到北京时间
+    const beijingMillis = now.getTime() + (8 * 60 * 60 * 1000);
+    const beijingTime = new Date(beijingMillis);
+
+    // 使用UTC方法获取北京时间的年月日（因为beijingTime内部存储的是UTC+8的时间戳）
+    const currentYear = beijingTime.getUTCFullYear();
+    const currentMonth = beijingTime.getUTCMonth();
+    const currentDate = beijingTime.getUTCDate();
+
     // 获取佳怡的生日配置
     const jiayiBirthday = ANNIVERSARIES.find(item => item.id === 'jiayi_birthday');
     if (!jiayiBirthday) return false;
-    
+
     // 计算今年的生日日期
     const birthdayThisYear = lunarToSolar(currentYear, jiayiBirthday.month, jiayiBirthday.day);
     if (!birthdayThisYear) return false;
-    
+
     // 检查是否是同一天
-    return today.getFullYear() === birthdayThisYear.getFullYear() &&
-           today.getMonth() === birthdayThisYear.getMonth() &&
-           today.getDate() === birthdayThisYear.getDate();
+    return currentYear === birthdayThisYear.getFullYear() &&
+           currentMonth === birthdayThisYear.getMonth() &&
+           currentDate === birthdayThisYear.getDate();
 }
 
 // 计算佳怡的年龄
