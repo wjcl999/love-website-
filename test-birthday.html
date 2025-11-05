@@ -4,15 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎂 佳怡生日快乐！ - 我们的爱情时光</title>
-    
-    <!-- 防缓存配置 -->
+
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
+
+    <!-- SEO优化 -->
+    <meta name="description" content="佳怡生日快乐！奕铭为你准备的生日惊喜">
+
+    <!-- 缓存策略优化（测试页面保持no-cache） -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    
+
     <!-- 样式文件 -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="animations.css">
+    <link rel="stylesheet" href="style.css?v=1.0.1">
+    <link rel="stylesheet" href="animations.css?v=1.0.1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- 临时脚本：强制启用生日模式 -->
@@ -114,7 +120,7 @@
     // 临时修改生日检测函数，强制返回true
     window.originalScript = true;
     </script>
-    <script src="script.js"></script>
+    <script src="script.js?v=1.0.1"></script>
     <script>
     // 强制启用生日模式
     if (window.FORCE_BIRTHDAY_MODE) {
