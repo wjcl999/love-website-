@@ -1033,7 +1033,10 @@ function isBirthdayToday() {
 
 // 计算佳怡的年龄
 function calculateJiayiAge() {
-    const birth = parseISODate(HOROSCOPE_CONFIG?.couples?.girl?.birthday);
+    const girlBirthday = HOROSCOPE_CONFIG && HOROSCOPE_CONFIG.couples && HOROSCOPE_CONFIG.couples.girl
+        ? HOROSCOPE_CONFIG.couples.girl.birthday
+        : null;
+    const birth = parseISODate(girlBirthday);
     if (!birth) return 0;
 
     const today = getBeijingDateParts();
@@ -4130,7 +4133,7 @@ function getNextAnniversaryDate(anniversary) {
     if (anniversary.type === 'lunar') {
         // 用今天的农历年份作为基准，避免“1月跨年”时农历 12 月等日期算到下一年
         const lunarToday = solarToLunarYMD(today.year, today.month, today.day);
-        const baseLunarYear = lunarToday?.lunarYear ?? today.year;
+        const baseLunarYear = lunarToday && typeof lunarToday.lunarYear === 'number' ? lunarToday.lunarYear : today.year;
         const isLeapMonth = Boolean(anniversary.isLeapMonth);
 
         let targetYMD = lunarToSolarYMD(baseLunarYear, anniversary.month, anniversary.day, isLeapMonth);
