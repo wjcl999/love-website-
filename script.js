@@ -1017,30 +1017,43 @@ function isBirthdayToday() {
     // ========== 取消注释下面这行来永久测试生日页面 ==========
     // return true;
 
-    // 获取北京时间 (UTC+8)
-    const now = new Date();
-    const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000) + (now.getTimezoneOffset() * 60 * 1000));
-    const today = beijingTime;
-    const currentYear = today.getFullYear();
-    
-    // 获取佳怡的生日配置
+    // 以北京时间为准，直接判断“今天”的农历是否为配置的生日（避免手写表/时区导致的偏差）
+    const today = getBeijingDateParts();
+    const lunarToday = solarToLunarYMD(today.year, today.month, today.day);
+    if (!lunarToday) return false;
+
     const jiayiBirthday = ANNIVERSARIES.find(item => item.id === 'jiayi_birthday');
-    if (!jiayiBirthday) return false;
-    
-    // 计算今年的生日日期
-    const birthdayThisYear = lunarToSolar(currentYear, jiayiBirthday.month, jiayiBirthday.day);
-    if (!birthdayThisYear) return false;
-    
-    // 检查是否是同一天
-    return today.getFullYear() === birthdayThisYear.getFullYear() &&
-           today.getMonth() === birthdayThisYear.getMonth() &&
-           today.getDate() === birthdayThisYear.getDate();
+    if (!jiayiBirthday || jiayiBirthday.type !== 'lunar') return false;
+
+    const isLeapBirthdayMonth = Boolean(jiayiBirthday.isLeapMonth);
+    return lunarToday.lunarMonth === jiayiBirthday.month &&
+           lunarToday.lunarDay === jiayiBirthday.day &&
+           lunarToday.isLeapMonth === isLeapBirthdayMonth;
 }
 
 // 计算佳怡的年龄
 function calculateJiayiAge() {
-    // 直接返回19岁
-    return 19;
+    const birth = parseISODate(HOROSCOPE_CONFIG?.couples?.girl?.birthday);
+    if (!birth) return 0;
+
+    const today = getBeijingDateParts();
+    let age = today.year - birth.year;
+
+    // 使用农历生日换算到当年的阳历日期来判断是否已过生日（与生日模式逻辑一致）
+    const jiayiBirthday = ANNIVERSARIES.find(item => item.id === 'jiayi_birthday');
+    if (jiayiBirthday && jiayiBirthday.type === 'lunar') {
+        const birthdayThisYear = lunarToSolarYMD(today.year, jiayiBirthday.month, jiayiBirthday.day, Boolean(jiayiBirthday.isLeapMonth));
+        if (birthdayThisYear && compareYMD(today, birthdayThisYear) < 0) {
+            age -= 1;
+        }
+        return Math.max(0, age);
+    }
+
+    // 兜底：按配置的阳历生日判断
+    if (today.month < birth.month || (today.month === birth.month && today.day < birth.day)) {
+        age -= 1;
+    }
+    return Math.max(0, age);
 }
 
 // 生日模式初始化
@@ -1956,6 +1969,9 @@ document.addEventListener('DOMContentLoaded', function() {
     loadStaticGallery();
     initHoroscope();
     initWeather();
+    
+    // 跨北京时间 0 点自动刷新，确保生日模式/纪念日日期及时切换
+    scheduleBeijingMidnightReload();
     
     console.log('✨ 网站加载完成！');
 });
@@ -3848,98 +3864,305 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==================== 农历转换功能 ====================
-// 准确的农历转换数据（基于权威日历查询）
-const LUNAR_CALENDAR_DATA = {
-    2025: {
-        1: [29, 1], // 农历正月初一对应阳历2025年1月29日（春节）
-        7: [23, 8], // 农历七月初一对应阳历8月23日，七夕（初七）是8月29日，二十四是9月15日
-        12: [19, 1] // 农历腊月初一对应阳历2026年1月19日（预估）
-    },
-    2026: {
-        1: [17, 2], // 农历正月初一对应阳历2026年2月17日
-        7: [12, 8], // 农历七月初一对应阳历8月12日
-        12: [8, 1] // 农历腊月初一对应阳历2027年1月8日（预估）
-    }
-};
+// 使用通用农历算法（1900-2100），避免手写表导致的生日/纪念日日期错误与年份缺失问题。
+const BEIJING_TIME_ZONE = 'Asia/Shanghai';
+const BEIJING_UTC_OFFSET_HOURS = 8;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
-// 将农历日期转换为阳历日期
-function lunarToSolar(year, lunarMonth, lunarDay) {
-    try {
-        if (!LUNAR_CALENDAR_DATA[year] || !LUNAR_CALENDAR_DATA[year][lunarMonth]) {
-            return null;
-        }
-        
-        const [solarDay, solarMonth] = LUNAR_CALENDAR_DATA[year][lunarMonth];
-        const adjustedDay = solarDay + lunarDay - 1;
-        
-        // 处理月份边界
-        if (lunarMonth === 12 && adjustedDay > 31) {
-            return new Date(year + 1, 0, adjustedDay - 31);
-        } else if (adjustedDay > 31) {
-            return new Date(year, solarMonth, adjustedDay - 31);
-        } else if (adjustedDay <= 0) {
-            return new Date(year, solarMonth - 2, 31 + adjustedDay);
-        }
-        
-        return new Date(year, solarMonth - 1, adjustedDay);
-    } catch (error) {
-        console.error('农历转换错误:', error);
-        return null;
+// 农历数据：1900-2100（常用公开历法表）
+const LUNAR_MIN_YEAR = 1900;
+const LUNAR_MAX_YEAR = 2100;
+const LUNAR_BASE_UTC = Date.UTC(1900, 0, 31); // 1900-01-31 = 农历1900年正月初一
+const LUNAR_INFO = [
+    0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2, // 1900-1909
+    0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977, // 1910-1919
+    0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970, // 1920-1929
+    0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950, // 1930-1939
+    0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557, // 1940-1949
+    0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0, // 1950-1959
+    0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0, // 1960-1969
+    0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6, // 1970-1979
+    0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570, // 1980-1989
+    0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x05ac0, 0x0ab60, 0x096d5, 0x092e0, // 1990-1999
+    0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5, // 2000-2009
+    0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930, // 2010-2019
+    0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530, // 2020-2029
+    0x05aa0, 0x076a3, 0x096d0, 0x04afb, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45, // 2030-2039
+    0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0, // 2040-2049
+    0x14b63, 0x09370, 0x049f8, 0x04970, 0x064b0, 0x168a6, 0x0ea50, 0x06b20, 0x1a6c4, 0x0aae0, // 2050-2059
+    0x092e0, 0x0d2e3, 0x0c960, 0x0d557, 0x0d4a0, 0x0da50, 0x05d55, 0x056a0, 0x0a6d0, 0x055d4, // 2060-2069
+    0x052d0, 0x0a9b8, 0x0a950, 0x0b4a0, 0x0b6a6, 0x0ad50, 0x055a0, 0x0aba4, 0x0a5b0, 0x052b0, // 2070-2079
+    0x0b273, 0x06930, 0x07337, 0x06aa0, 0x0ad50, 0x14b55, 0x04b60, 0x0a570, 0x054e4, 0x0d160, // 2080-2089
+    0x0e968, 0x0d520, 0x0daa0, 0x16aa6, 0x056d0, 0x04ae0, 0x0a9d4, 0x0a4d0, 0x0d150, 0x0f252, // 2090-2099
+    0x0d520 // 2100
+];
+
+const BEIJING_DATE_TIME_FORMATTER = new Intl.DateTimeFormat('zh-CN', {
+    timeZone: BEIJING_TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23'
+});
+
+function parseISODate(dateString) {
+    if (typeof dateString !== 'string') return null;
+    const match = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(dateString.trim());
+    if (!match) return null;
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+    if (month < 1 || month > 12) return null;
+    if (day < 1 || day > 31) return null;
+    return { year, month, day };
+}
+
+function compareYMD(a, b) {
+    if (a.year !== b.year) return a.year - b.year;
+    if (a.month !== b.month) return a.month - b.month;
+    return a.day - b.day;
+}
+
+function getBeijingDateTimeParts(date = new Date()) {
+    const parts = BEIJING_DATE_TIME_FORMATTER.formatToParts(date);
+    const map = {};
+    for (const part of parts) {
+        if (part.type !== 'literal') map[part.type] = part.value;
     }
+    return {
+        year: Number(map.year),
+        month: Number(map.month),
+        day: Number(map.day),
+        hour: Number(map.hour),
+        minute: Number(map.minute),
+        second: Number(map.second)
+    };
+}
+
+function getBeijingDateParts(date = new Date()) {
+    const dt = getBeijingDateTimeParts(date);
+    return { year: dt.year, month: dt.month, day: dt.day };
+}
+
+function beijingMidnightTimestamp(year, month, day) {
+    return Date.UTC(year, month - 1, day, 0, 0, 0) - (BEIJING_UTC_OFFSET_HOURS * 60 * 60 * 1000);
+}
+
+function makeBeijingDate(year, month, day) {
+    return new Date(beijingMidnightTimestamp(year, month, day));
+}
+
+function getNextBeijingMidnightTimestamp(fromDate = new Date()) {
+    const today = getBeijingDateParts(fromDate);
+    return beijingMidnightTimestamp(today.year, today.month, today.day) + DAY_MS;
+}
+
+function scheduleBeijingMidnightReload() {
+    // 测试页会强制生日模式，不影响；正常页用于跨 0 点自动切换生日/普通模式
+    const now = new Date();
+    const nextMidnight = getNextBeijingMidnightTimestamp(now);
+    const delay = Math.max(1000, nextMidnight - now.getTime() + 1500);
+    setTimeout(() => {
+        try {
+            window.location.reload();
+        } catch (e) {
+            // ignore
+        }
+    }, delay);
+}
+
+function getLeapMonth(lunarYear) {
+    return LUNAR_INFO[lunarYear - LUNAR_MIN_YEAR] & 0xf;
+}
+
+function getLeapDays(lunarYear) {
+    if (getLeapMonth(lunarYear)) {
+        return (LUNAR_INFO[lunarYear - LUNAR_MIN_YEAR] & 0x10000) ? 30 : 29;
+    }
+    return 0;
+}
+
+function getLunarMonthDays(lunarYear, lunarMonth) {
+    if (lunarMonth < 1 || lunarMonth > 12) return 0;
+    return (LUNAR_INFO[lunarYear - LUNAR_MIN_YEAR] & (0x10000 >> lunarMonth)) ? 30 : 29;
+}
+
+function getLunarYearDays(lunarYear) {
+    let sum = 348;
+    const info = LUNAR_INFO[lunarYear - LUNAR_MIN_YEAR];
+    for (let mask = 0x8000; mask > 0x8; mask >>= 1) {
+        sum += (info & mask) ? 1 : 0;
+    }
+    return sum + getLeapDays(lunarYear);
+}
+
+function solarToLunarYMD(year, month, day) {
+    if (year < LUNAR_MIN_YEAR || year > LUNAR_MAX_YEAR) return null;
+    if (year === 1900 && month === 1 && day < 31) return null;
+
+    const utc = Date.UTC(year, month - 1, day);
+    let offset = Math.floor((utc - LUNAR_BASE_UTC) / DAY_MS);
+    if (offset < 0) return null;
+
+    let lunarYear;
+    let temp = 0;
+    for (lunarYear = LUNAR_MIN_YEAR; lunarYear <= LUNAR_MAX_YEAR && offset > 0; lunarYear++) {
+        temp = getLunarYearDays(lunarYear);
+        offset -= temp;
+    }
+    if (offset < 0) {
+        offset += temp;
+        lunarYear--;
+    }
+
+    const leap = getLeapMonth(lunarYear);
+    let isLeap = false;
+    let lunarMonth;
+    for (lunarMonth = 1; lunarMonth <= 12 && offset > 0; lunarMonth++) {
+        if (leap > 0 && lunarMonth === leap + 1 && !isLeap) {
+            lunarMonth--;
+            isLeap = true;
+            temp = getLeapDays(lunarYear);
+        } else {
+            temp = getLunarMonthDays(lunarYear, lunarMonth);
+        }
+
+        if (isLeap && lunarMonth === leap + 1) {
+            isLeap = false;
+        }
+
+        offset -= temp;
+    }
+
+    if (offset === 0 && leap > 0 && lunarMonth === leap + 1) {
+        if (isLeap) {
+            isLeap = false;
+        } else {
+            isLeap = true;
+            lunarMonth--;
+        }
+    }
+
+    if (offset < 0) {
+        offset += temp;
+        lunarMonth--;
+    }
+
+    const lunarDay = offset + 1;
+    return {
+        lunarYear,
+        lunarMonth,
+        lunarDay,
+        isLeapMonth: isLeap
+    };
+}
+
+function lunarToSolarYMD(lunarYear, lunarMonth, lunarDay, isLeapMonth = false) {
+    if (lunarYear < LUNAR_MIN_YEAR || lunarYear > LUNAR_MAX_YEAR) return null;
+    if (lunarYear === 2100 && lunarMonth === 12 && lunarDay > 1) return null;
+    if (lunarYear === 1900 && lunarMonth === 1 && lunarDay < 31) return null;
+
+    const leapMonth = getLeapMonth(lunarYear);
+    if (isLeapMonth && leapMonth !== lunarMonth) return null;
+
+    const normalMonthDays = getLunarMonthDays(lunarYear, lunarMonth);
+    const leapMonthDays = getLeapDays(lunarYear);
+    const maxDay = isLeapMonth ? leapMonthDays : normalMonthDays;
+    if (lunarMonth < 1 || lunarMonth > 12) return null;
+    if (lunarDay < 1 || lunarDay > maxDay) return null;
+
+    let offset = 0;
+    for (let y = LUNAR_MIN_YEAR; y < lunarYear; y++) {
+        offset += getLunarYearDays(y);
+    }
+
+    for (let m = 1; m < lunarMonth; m++) {
+        offset += getLunarMonthDays(lunarYear, m);
+        if (leapMonth === m) {
+            offset += leapMonthDays;
+        }
+    }
+
+    // 若是闰月，需要补上该月的“正常月”天数
+    if (isLeapMonth && leapMonth === lunarMonth) {
+        offset += normalMonthDays;
+    }
+
+    offset += lunarDay - 1;
+
+    const utc = LUNAR_BASE_UTC + offset * DAY_MS;
+    const date = new Date(utc);
+    return {
+        year: date.getUTCFullYear(),
+        month: date.getUTCMonth() + 1,
+        day: date.getUTCDate()
+    };
+}
+
+// 将农历日期转换为阳历 Date（以北京时间当天 00:00 为基准的时间戳）
+function lunarToSolar(lunarYear, lunarMonth, lunarDay, isLeapMonth = false) {
+    const ymd = lunarToSolarYMD(lunarYear, lunarMonth, lunarDay, isLeapMonth);
+    if (!ymd) return null;
+    return makeBeijingDate(ymd.year, ymd.month, ymd.day);
 }
 
 // ==================== 纪念日计算功能 ====================
 // 计算下一个纪念日日期
-function getNextAnniversaryDate(anniversary, currentYear = new Date().getFullYear()) {
-    const currentDate = new Date();
-    let targetDate;
-    
+function getNextAnniversaryDate(anniversary) {
+    const now = new Date();
+    const today = getBeijingDateParts(now);
+
     if (anniversary.type === 'yearly') {
-        // 阳历纪念日
-        targetDate = new Date(currentYear, anniversary.month - 1, anniversary.day);
-        
-        // 如果今年的日期已过，计算明年的
-        if (targetDate <= currentDate) {
-            targetDate = new Date(currentYear + 1, anniversary.month - 1, anniversary.day);
+        const thisYearYMD = { year: today.year, month: anniversary.month, day: anniversary.day };
+        let targetDate = makeBeijingDate(thisYearYMD.year, thisYearYMD.month, thisYearYMD.day);
+
+        // 纪念日按“整天”计算：如果日期早于今天，才算“已过”
+        if (compareYMD(thisYearYMD, today) < 0) {
+            targetDate = makeBeijingDate(today.year + 1, anniversary.month, anniversary.day);
         }
-    } else if (anniversary.type === 'lunar') {
-        // 农历纪念日
-        targetDate = lunarToSolar(currentYear, anniversary.month, anniversary.day);
-        
-        if (!targetDate || targetDate <= currentDate) {
-            // 尝试下一年
-            targetDate = lunarToSolar(currentYear + 1, anniversary.month, anniversary.day);
-        }
-        
-        // 如果还是获取不到，使用预估日期
-        if (!targetDate) {
-            const estimatedMonth = anniversary.month === 12 ? 0 : anniversary.month - 1;
-            const estimatedDay = anniversary.day + 10; // 简单的估算
-            targetDate = new Date(currentYear + (anniversary.month === 12 ? 1 : 0), estimatedMonth, estimatedDay);
-        }
+        return targetDate;
     }
-    
-    return targetDate;
+
+    if (anniversary.type === 'lunar') {
+        // 用今天的农历年份作为基准，避免“1月跨年”时农历 12 月等日期算到下一年
+        const lunarToday = solarToLunarYMD(today.year, today.month, today.day);
+        const baseLunarYear = lunarToday?.lunarYear ?? today.year;
+        const isLeapMonth = Boolean(anniversary.isLeapMonth);
+
+        let targetYMD = lunarToSolarYMD(baseLunarYear, anniversary.month, anniversary.day, isLeapMonth);
+
+        if (!targetYMD || compareYMD(targetYMD, today) < 0) {
+            targetYMD = lunarToSolarYMD(baseLunarYear + 1, anniversary.month, anniversary.day, isLeapMonth) || targetYMD;
+        }
+
+        if (!targetYMD) return null;
+        return makeBeijingDate(targetYMD.year, targetYMD.month, targetYMD.day);
+    }
+
+    return null;
 }
 
 // 计算距离纪念日的剩余时间
 function calculateTimeUntilAnniversary(anniversaryDate) {
     const now = new Date();
     const timeDiff = anniversaryDate.getTime() - now.getTime();
-    
-    // 如果已经过了纪念日
-    if (timeDiff <= 0) return { days: 0, hours: 0, minutes: 0, isToday: true };
-    
-    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+    // 以北京时间的“日期”判断是否为今天（避免时区差导致误判）
+    const today = getBeijingDateParts(now);
+    const anniversaryDay = getBeijingDateParts(anniversaryDate);
+    const isToday = compareYMD(anniversaryDay, today) === 0;
+
+    // 如果已经过了纪念日时间点（当天 00:00），但仍在同一天，仍然视为“今天”
+    if (timeDiff <= 0) return { days: 0, hours: 0, minutes: 0, isToday };
+
+    const days = Math.floor(timeDiff / DAY_MS);
+    const hours = Math.floor((timeDiff % DAY_MS) / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-    
-    // 更准确的"今天"判断：检查是否是同一天
-    const today = new Date();
-    const isToday = anniversaryDate.getFullYear() === today.getFullYear() &&
-                   anniversaryDate.getMonth() === today.getMonth() &&
-                   anniversaryDate.getDate() === today.getDate();
-    
+
     return { days, hours, minutes, isToday };
 }
 
@@ -3963,7 +4186,8 @@ function createAnniversaryCard(anniversary, timeLeft, anniversaryDate) {
     const dateStr = anniversaryDate.toLocaleDateString('zh-CN', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: BEIJING_TIME_ZONE
     });
     
     // 判断图标是图片URL还是emoji
@@ -3986,13 +4210,12 @@ function createAnniversaryCard(anniversary, timeLeft, anniversaryDate) {
 function updateAnniversaries() {
     const container = document.getElementById('anniversaryCards');
     if (!container) return;
-    
-    const currentYear = new Date().getFullYear();
+
     const upcomingAnniversaries = [];
     
     // 计算所有纪念日并排序
     ANNIVERSARIES.forEach(anniversary => {
-        const nextDate = getNextAnniversaryDate(anniversary, currentYear);
+        const nextDate = getNextAnniversaryDate(anniversary);
         if (nextDate) {
             const timeLeft = calculateTimeUntilAnniversary(nextDate);
             upcomingAnniversaries.push({
